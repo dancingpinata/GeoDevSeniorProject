@@ -1,3 +1,5 @@
 # team5geology
-Repository for Eastern Washington University Senior Project W17 Team 5: Geology <br />
-<b>Team Members:</b> Tristan Lehmbecker, Andrew Scholz, Rachelle Boyette
+Repository for Eastern Washington University Senior Project F17 Team 3: Geology <br />
+<b>Team Members (Student-side):</b> Brian Buermann, Sean Gormley, Lexi Guches
+
+<b>Team Members (Teacher-side):</b> Tristan Lehmbecker, Andrew Scholz, Rachelle Boyette
