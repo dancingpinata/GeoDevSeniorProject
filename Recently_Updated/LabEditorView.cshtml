@@ -17,6 +17,55 @@
     </script>
 </head>
 <body>
+    <div class='row row-relative exercise' id='ex-0'>
+        <!--hidden-->
+        <div class='text-center remove-exercise'>
+            <button class='btn btn-default remove-ex' id='remove-ex-0' title='Remove Exercise'>Remove</button>
+        </div>
+        <div class='col-sm-8 exercise-content'>
+            <div class='exercise-title'>
+                Exercise Title: <input id='ex-title-0' type='text'>
+            </div>
+            <div id='summernote0'></div>
+            <div class='exercise-response-type'>
+                Response:
+                <select id='ex-response-0' name='response-type'>
+                    <option value='short'>Short Answer</option>
+                    <option value='blank'>Fill in the Blank</option>
+                    <option value='long'>Long Answer</option>
+                    <option value='multi'>Multiple Choice, Single Answer (Buttons)</option>
+                    <option value='many'>Multiple Choice, Multi Answers (Buttons)</option>
+                    <option value='dropMulti'>Multiple Choice, Single Answer (Drop-Down List)</option>
+                    <option value='dropMany'>Multiple Choice, Multi Answers (Drop-Down List)</option>
+                    <option value='img'>Image</option>
+                    <option value='vid'>Video</option>
+                    <option value='date'>Date</option>
+                    <option value='group'>Group</option>
+                </select>
+                <div id='multi-choice-0' hidden>
+                    <div class='multi-options' id="ex-multi-0">
+                        <label>Option 1:</label><input type='text' name='multi-1'>
+                        <label>Option 2:</label><input type='text' name='multi-2'>
+                    </div>
+                    <button class='btn btn-default' id='add-multi-option-0' title='Create New Multiple Choice'>Add</button>
+                    <button class='btn btn-default' id='remove-multi-option-0' title='Remove Multiple Choice Opt' disabled>Delete</button>
+                </div>
+                <div class='new-exercise row' id='ex-group-0' style="border: 2px solid #eeeeee; border-radius: 4px;" hidden>
+                    <div id='exercises-group-0' data-depth='1' class="col-sm-12">
+                    </div>
+                    <div>
+                        <button class='btn btn-default' id='create-exercise-btn-0' title='Create New Exercise'><i class='glyphicon glyphicon-plus-sign'></i> Create New Exercise</button>
+                    </div>
+                </div>
+            </div>
+
+        </div> <!-- exerciseContent -->
+        <div class='text-center move'>
+            <button class='btn btn-default move-up' id='move-up-ex-0' title='Move Exercise Up'>Move Up</button>
+            <button class='btn btn-default move-down' id='move-down-ex-0' title='Move Exercise Up'>Move Down</button>
+        </div>
+        <hr />
+    </div> <!-- row -->
     <!-- Content -->
     <div class='container-fluid'>
         <div class='row row-relative'>
@@ -26,51 +75,7 @@
                     <input type='text' class='form-control title' id='lab-title' />
                     <hr>
                 </div>
-                <div class='exercises'>
-
-                    <div class='row row-relative exercise' id='ex-0' hidden>
-                        <div class='col-sm-1 text-center remove-exercise'>
-                            <button class='btn btn-default remove-ex' id='remove-ex-' title='Remove Exercise'>Remove</button>
-                        </div>
-
-                        <div class='col-sm-10 exercise-content'>
-
-                            <div class='exercise-title'>
-                                Exercise Title: <input id='ex-title-' type='text'>
-                            </div>
-                            <div id='summernote'></div>
-                            <div class='exercise-response-type'>
-                                Response:
-                                <select id='ex-response-' name='response-type'>
-                                    <option value='short'>Short Answer</option>
-                                    <option value='blank'>Fill in the Blank</option>
-                                    <option value='long'>Long Answer</option>
-                                    <option value='multi'>Multiple Choice, Single Answer (Buttons)</option>
-                                    <option value='many'>Multiple Choice, Multi Answers (Buttons)</option>
-                                    <option value='dropMulti'>Multiple Choice, Single Answer (Drop-Down List)</option>
-                                    <option value='dropMany'>Multiple Choice, Multi Answers (Drop-Down List)</option>
-                                    <option value='img'>Image</option>
-                                    <option value='vid'>Video</option>
-                                    <option value='date'>Date</option>
-                                </select>
-                                <div id='multi-choice-' hidden>
-                                    <div class='multi-options' id="ex-multi-">
-                                        <label>Option 1:</label><input type='text' name='multi-1'>
-                                        <label>Option 2:</label><input type='text' name='multi-2'>
-                                    </div>
-                                    <button class='btn btn-default' id='add-multi-option-' title='Create New Multiple Choice'>Add</button>
-                                    <button class='btn btn-default' id='remove-multi-option-' title='Remove Multiple Choice Opt' disabled>Delete</button>
-                                </div>
-                            </div>
-
-                        </div> <!-- exerciseContent -->
-                        <div class='col-sm-1 text-center move'>
-                            <button class='btn btn-default move-up' id='move-up-ex-' title='Move Exercise Up'>Move Up</button>
-                            <button class='btn btn-default move-down' id='move-down-ex-' title='Move Exercise Up'>Move Down</button>
-                        </div>
-                        <hr />
-                    </div> <!-- row -->
-
+                <div class='exercises' data-depth='0'>
                 </div> <!-- exercises -->
 
                 <div class='new-exercise'>

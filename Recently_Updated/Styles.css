@@ -1,0 +1,212 @@
+﻿body {
+    position: relative;
+}
+
+/* navbar */
+.navbar-default {
+    background-color: #a10022;
+    border-color: black;
+}
+
+.navbar-default .navbar-brand {
+    color: white;
+    font-size: 24px;
+}
+
+.navbar-default .navbar-brand:hover {
+    color: white;
+}
+
+.navbar-default .navbar-nav > li > a {
+    color: black;
+}
+
+.navbar-default .navbar-nav > li > a:hover {
+    color: black;
+}
+
+.backbtn {
+    float: left;
+    padding: 15px;
+    display: inline-block;
+    font-size: 2.5rem;
+    color: white;
+}
+
+#backIcon {
+    color: white;
+}
+
+/* footer */
+.footer {
+    color: white;
+    box-sizing: border-box;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin-bottom: -90px;
+    height: 90px;
+    width: 100%;
+    text-align: center;
+    background-color: #a10022;
+    border: 1px solid black;
+}
+
+    .footer p {
+        /* TODO: Vertical align text */
+        padding: 15px;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 24px;
+        top: 0;
+        bottom: 0;
+    }
+
+/* Lab Title */
+#create-exercise-btn {
+    margin-bottom: 1em;
+}
+
+.save-lab {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    background: #f5f5f5;
+}
+
+#save-lab-btn, #preview-lab-btn {
+    margin: 16px;
+}
+
+.exercise {
+    display:flex;
+    flex-flow: column wrap;
+    margin: 2em 0;
+}
+
+.remove-exercise, .move {
+    display: flex;
+    flex-flow: column wrap;
+    justify-content: space-between;
+    margin: 1em 1em;
+}
+
+.exercise-content {
+    flex-grow: 10;
+    margin: 0 1em;
+}
+
+.remove-ex, .move-up, .move-down {
+    margin: 1em 0;
+}
+
+@media (min-width: 900px){
+  .exercise {
+    display:flex;
+    flex-flow: row wrap;
+    margin: 2em 0;
+  }
+  
+  .remove-exercise, .move {
+    margin: 0 1em;
+  }
+}
+
+#ex-0 .exercise-content {
+    display: none;
+}
+
+#ex-0, #ex-0 .remove-exercise, #ex-0 .move {
+    display: none;
+    visibility: hidden;
+}
+
+.exercise-title {
+    margin-bottom: 1em;
+}
+
+hr {
+    border-top: 2px solid #eeeeee;
+}
+
+.exercise > hr{
+    position: absolute;
+    bottom: 0;
+}
+
+.multi-options > input{
+    display: block;
+    width: 30em;
+}
+
+.multi-options > input:last-child{
+    margin-bottom: 1em;
+}
+
+.multi-options + button{
+    margin-right: 1em;
+}
+/* date picker */
+.modal {
+    z-index: 4000;
+}
+
+.ui-datepicker {
+    font-family: Raleway;
+    z-index: 9000;
+}
+
+.ui-datepicker .ui-datepicker-title {
+    font-family: Raleway;
+    text-align: center;
+    color: white;
+}
+
+.ui-datepicker .ui-datepicker-header {
+    background: #a10022;
+    border-radius: 4px;
+}
+
+.ui-datepicker-calendar a.ui-state-default {
+    background: inherit;
+    border: none;
+    text-align: center;
+}
+
+.ui-datepicker-calendar td.ui-datepicker-today a {
+    box-shadow:
+        inset 0 2px 2px 0 rgba(255,255,255,0.4);
+    border-radius: 4px;
+    color: inherit;
+    background: #f7e766;
+}
+
+.ui-datepicker-calendar td.ui-datepicker-today a.ui-state-active {
+    box-shadow:
+        inset 0 4px 4px 0 rgba(255,255,255,0.4);
+    border-radius: 4px;
+    color: white;
+    background: #a10022;
+}
+
+.ui-datepicker-calendar a.ui-state-active {
+    border-radius: 4px;
+    color: white;
+    background: #a10022;
+}
+
+.ui-datepicker-calendar a.ui-state-hover {
+    border-radius: 4px;
+    background: #dddddd;
+    border: solid 1px #bbbbbb;
+}
+.ui-datepicker .ui-datepicker-prev .ui-icon,
+.ui-datepicker .ui-datepicker-next .ui-icon {
+	background-image: url("themes/base/images/ui-icons_777777_256x240.png");
+}
+
+.ui-datepicker .ui-datepicker-prev-hover,
+.ui-datepicker .ui-datepicker-next-hover {
+    background: #f7e766;
+    border: none;
+}
