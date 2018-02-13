@@ -115,3 +115,14 @@ function populateLab(response) {
     }
      */
 }
+
+function barMove() {
+    var bar = document.getElementById("progressBar");
+    var width = bar.style.css("width");
+    width = width.replace(/\D/g, '');   //Strip non-numbers from width
+    var totalExercises = Model.ExerciseList.Count;
+    if (width < 100) {
+        width += ((1 / totalExercises) * 100);
+        bar.style.width = width + '%';
+    }
+}
