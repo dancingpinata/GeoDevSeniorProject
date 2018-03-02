@@ -1,0 +1,44 @@
+﻿
+@{
+    ViewBag.Title = "LabDirectoryView";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section head {
+    <script type="text/javascript" src="~/Scripts/LabDirectory.js"></script>
+}
+
+<h2>Current Labs</h2>
+<table class="table table-hover table-striped">
+    <thead>
+        <tr>
+            <th scope="col">Lab Key</th>
+            <th scope="col">Due Date</th>
+        </tr>
+    </thead>
+    <tbody id="curlabs">
+        <tr id="cur-0" hidden>
+            <th scope="row">
+                <a id="cur-name-0" style="cursor:pointer">New Lab</a>
+            </th>
+            <th scope="row" id="cur-due-0"></th>
+        </tr>
+    </tbody>
+</table>
+<h2>Past Labs</h2>
+<table class="table table-hover table-striped">
+    <thead>
+        <tr>
+            <th scope="col">Lab Key</th>
+            <th scope="col">Due Date</th>
+        </tr>
+    </thead>
+    <tbody id="pastlabs">
+        <tr id="past-0" hidden>
+            <th scope="row">
+                <a id="past-name-0" style="cursor:pointer">New Lab</a>
+            </th>
+            <th scope="row" id="past-due-0"></th>
+        </tr>
+    </tbody>
+</table>
