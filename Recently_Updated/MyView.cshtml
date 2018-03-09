@@ -1,0 +1,112 @@
+﻿@model GeoLab100.Models.User
+@{
+    ViewBag.Title = "Login";
+    //Layout = null;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>MyView</title>
+    <script>
+            function check()/*function to check userid & password*/
+            {
+                /*the following code checkes whether the entered userid and password are matching
+                * this should be done in PHP, JavaScript is insecure and should not handle sensitive information
+                */
+                var EWUid = $('#EWUid').val();
+                var pw = $('#Password').val();
+                var la = $('#LoginAs').val();
+                var loginData = JSON.stringify({
+                    'EWUid': EWUid,
+                    'pw': pw,
+                    'la': la
+                });
+                $.ajax({
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    type: 'POST',
+                    url: '../Login/Test', 
+                    data: loginData, 
+                    success: function (response, textStatus, jqHXR)
+                    {
+                        if(response.type=="Student")
+                        {
+                            location.assign('../../Lab/LabDirectoryView');
+                        }
+                        else if(response.type == "Administrator")
+                        {
+                            location.assign('../../Lab/LabManagerView');
+                        }
+                    },
+                    error: function (jqHXR, textStatus, errorThrown) {
+                        alert("Error: Username or Password is incorrect");
+                    }
+                });
+                /*if (loginForm.EWUid.value == "1234" && loginForm.Password.value == "pass")
+                {
+                    if (loginForm.LoginAs.value == "Administrator")
+                    {
+                        window.location.href = '../Lab/LabManagerView';
+                        return false;
+                    }
+                    if (loginForm.LoginAs.value == "Student")
+                    {
+                        window.location.href = '../Lab/LabDirectoryView';
+                        return false;
+                    }
+                }
+                else
+                {
+                    alert("Error: Username or Password is incorrect")//displays error message
+                }*/
+            }
+    </script>
+</head>
+    <body>
+        <form name="loginForm" onsubmit="return check(this);">
+            <div class="container-fluid">
+                <div class="row">
+                    <div align="right" class="col-xs-6">
+                        <label for='EWUid'>EWU id:</label>
+
+                    </div>
+                    <div class="col-xs-6">
+                        <input id="EWUid" type="text" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div align="right" class="col-xs-6">
+                        <label for='Password'>Password:</label>
+                    </div>
+                    <div class="col-xs-6">
+                        <input id="Password" type="password" />
+                    </div>
+                </div>
+
+                <!--Remove "Login as" after getting SSO acess-->
+                <div class="row">
+                    <div align="right" class="col-xs-6">
+                        <label for='Admin'>Login as:</label>
+                    </div>
+                    <div class="col-xs-6">
+                        <select id="LoginAs">
+                            <option> Administrator</option>
+                            <option> Student </option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div align="center">
+                <input id="Submit" class="btn btn-success" onclick="check()" value="Login" />
+            </div>
+
+        </form>
+
+    </body>
+</html>
+
