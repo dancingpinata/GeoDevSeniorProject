@@ -21,6 +21,9 @@ var labElements = ['remove-ex-',
 ];
 
 $(document).ready(function () {
+    $(".modal").on('show.bs.modal', function () {
+        $(".modal-dialog").css("margin-top", $(window).height() / 3).css("background", "white").css("border-radius", 4);
+    });
     var needsSave = false;
     $("#lab-title").val(window.document.title);
     $("#brand-title").val(window.document.title);
@@ -79,7 +82,7 @@ $(document).ready(function () {
             url: '../../Lab/Save',
             data: labData,
             success: function (response, textStatus, jqHXR) {
-                alert("Lab was saved successfully!");
+                modalAlert("Lab was saved successfully!","Lab Saved");
             },
             error: function (jqHXR, textStatus, errorThrown) {
                 console.log("The following errors occurred when saving the lab: " + textStatus, errorThrown);
@@ -93,7 +96,7 @@ $(document).ready(function () {
     // load the lab selected in LabManager
     loadLab(lab);
 }); // Document Ready
-
+// handle storing exercises while saving a lab, including nested exercises
 function store(exerciseTitles, exerciseContent, exerciseResponses, id, count) {
     for (var i = 1; i <= count; i++) {
         var exerciseTitle = htmlspecialchars($("#ex-title-" + id + i).val());
@@ -123,8 +126,11 @@ function loadExercises(exlist, id) {
         $("#ex-title-" + index).val(htmlspecialchars_decode(exlist[i].ExerciseTitle));
         $("#summernote" + index).contentEditor('content', exlist[i].Content);
         if (exlist[i].Response != '') {
-            var response = $(exlist[i].Response); // convert response back into a <div> tag
-            var t = response[0].classList[2];
+            var t = 'short';
+            if (exlist[i].Response != null) {
+                var response = $(exlist[i].Response); // convert response back into a <div> tag
+                t = response[0].classList[2];
+            }
             $("#ex-response-" + index).val(t);
             if (t == 'multi' || t == 'many' || t == 'dropMulti' || t == 'dropMany') {
                 var mc = $("#multi-choice-" + index).show();
@@ -165,12 +171,25 @@ function addExerciseEvents(id, html) {
         var exId = this.id.split('-');
         var exnum = exId[exId.length - 1];
         var end = exnum.lastIndexOf('_');
-        if (end == -1) {
-            numExercises--;
-            removeExercise(exnum, '.exercises');
-        }
+        var func = function (event) {
+            var exnum = event.data.exnum;
+            var end = event.data.end;
+            if (end == -1) {
+                numExercises--;
+                removeExercise(exnum, '.exercises');
+            }
+            else
+                removeExercise(exnum, '#exercises-group-' + exnum.substring(0, end));
+        };
+        if ($('#ex-response-' + exnum).val() != 'group')
+            func({ data: { 'exnum': exnum, 'end': end } });
         else
-            removeExercise(exnum, '#exercises-group-' + exnum.substring(0, end));
+            modalConfirm({
+                msg: "The exercises in this group exercise will be removed. Press 'OK' to continue.",
+                ok: func,
+                okData: { 'exnum': exnum, 'end': end }
+            });
+        return;
     });
 
     $("#move-up-ex-" + id).on('click', function () {
@@ -190,16 +209,38 @@ function addExerciseEvents(id, html) {
     });
 
     $('select').on('change', function () {
-        var id = $(this).attr('id').split('-');
-        var exNum = id[id.length - 1];
-        if (this.value == "multi" || this.value == "many" || this.value == "dropMulti" || this.value == "dropMany")
-            $("#multi-choice-" + exNum).show();
-        else
-            $("#multi-choice-" + exNum).hide();
-        if (this.value == 'group')
-            $("#ex-group-" + exNum).show();
-        else
-            $("#ex-group-" + exNum).hide();
+        mutexLock(function (args) {
+            var id = $(args).attr('id').split('-');
+            var exNum = id[id.length - 1];
+            var func = function (event) {
+                var exNum = event.data.exNum;
+                var value = event.data.value;
+                if (value == "multi" || value == "many" || value == "dropMulti" || value == "dropMany")
+                    $("#multi-choice-" + exNum).show();
+                else
+                    $("#multi-choice-" + exNum).hide();
+                if (value == 'group')
+                    $("#ex-group-" + exNum).show();
+                else {
+                    $("#ex-group-" + exNum).hide();
+                    var len = $('#exercises-group-' + exNum).children().length;
+                    while (len > 0) {
+                        removeExercise(exNum + '_' + len, '#exercises-group-' + exNum + '_' + len);
+                        len--;
+                    }
+                }
+            };
+            if (args.value == 'group' || $('#ex-group-' + exNum).is(':hidden'))
+                func({ data: { exNum: exNum, value: args.value } });
+            else
+                modalConfirm({
+                    msg: "The exercises in this group exercise will be removed. Press 'OK' to continue.",
+                    ok: func,
+                    okData: { 'value': args.value, 'exNum': exNum },
+                    cancel: function (event) { event.data.args.value = 'group'; },
+                    cancelData: { 'args': args }
+                });
+        }, 'select', this);
     });
 
     $("#add-multi-option-" + id).on('click', function () {
@@ -281,9 +322,8 @@ function removeExercise(exerciseNum, selector) {
 function contentEditorClean(exerciseNum) {
     $('#summernote' + exerciseNum).contentEditor('destroy');
     var children = $('#exercises-group-' + exerciseNum).children();
-    for (var i = 1; i <= children.length; i++) {
+    for (var i = 1; i <= children.length; i++)
         contentEditorClean(exerciseNum + '_' + i);
-    }
 }
 /*=============================================================
  * Moves an exercise in the exercises div

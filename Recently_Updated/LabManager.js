@@ -1,8 +1,10 @@
 ﻿var numLabs = 0;
 var labs;
-var lock = false;
 var selectedDate;
 $(document).ready(function () {
+    $(".modal").on('show.bs.modal', function () {
+        $(".modal-dialog").css("margin-top", $(window).height() / 3).css("background", "white").css("border-radius", 4);
+    });
     $.ajax({
         contentType: 'application/json; charset=utf-8',
         type: 'POST',
@@ -18,16 +20,23 @@ $(document).ready(function () {
     });
     $(function () {
         $('#date-pick').datepicker({
-            dateFormat: 'mm-dd-yy'
+            dateFormat: 'yy-mm-dd'
         });
     });
     $('#date-btn').on('click', function () {
         $('#date-pick').datepicker('show');
     });
     $('#btn-datetime').on('click', function () {
-        var date = new Date($('#date-pick').val() + ' ' + $('#input-time').val());
+        var time = $('#input-time').val();
+        if (null != time.match(/^\s*((1[0-2]|0?\d)(:[0-5]\d){0,2}\s*([ap]m|[AP]M)|24(:00){0,2}|([01]?\d|2[0-3])(:[0-5]\d){0,2})\s*$/))
+            time = toMilitary(time);
+        else
+            time = 'NaN';
+        var date = new Date('NaN');
+        if ($('#date-pick').val().match(/^\d{4}-\d{2}-\d{2}$/))
+            var date = new Date($('#date-pick').val() + 'T' + time);
         if (isNaN(date.getTime()))
-            alert('invalid date!');
+            modalAlert('Invalid date selected!', 'Bad Date Picked');
         else {
             $('#datetime-modal').modal('toggle');
             labs[selectedDate - 1].DueDate = date;
@@ -43,16 +52,15 @@ $(document).ready(function () {
                 url: '../Lab/SetDue',
                 data: dueData,
                 success: function (response, textStatus, jqHXR) {
-                    
+                    $('span[name="span-due"]', '#lab-due-' + selectedDate).html(htmlspecialchars(date.toDateString() + ' ' + date.toLocaleTimeString()));
                 },
-                error: function (jqHXR, textStatus, errorThrown) {
-                    
-                }
+                error: function (jqHXR, textStatus, errorThrown) { }
             });
         }
     });
     $('#btn-no-date').on('click', function () {
         date = null;
+        $('span[name="span-due"]', '#lab-due-' + selectedDate).html('No due date');
     });
 });
 /*==================================================
@@ -68,13 +76,19 @@ function createLab(lab) {
         'lab-name-'
     ]);
     var j = $("#lab-publish-" + numLabs);
-    var result = getPublishTable(j, lab.IsPublished ? "Publish" : "Unpublish");
+    var result = getPublishTable(j, lab.IsPublished ? "Unpublished" : "Published");
     result.act();
     j.html(result.opp);
-    $("#lab-name-" + numLabs, html).html(lab.LabName);
+    $("#lab-name-" + numLabs, html).html(htmlspecialchars(lab.LabName));
     /*=======================
       Assign due date
     =======================*/
+    var date = new Date(lab.DueDate);
+    if (lab.DueDate == null)
+        date = "No due date";
+    else
+        date = date.toDateString() + ' ' + date.toLocaleTimeString();
+    $('span[name="span-due"]', '#lab-due-' + numLabs).html(date);
     $("#lab-due-" + numLabs).on('click', function () {
         var exId = this.id.split('-');
         selectedDate = exId[exId.length - 1];
@@ -96,31 +110,38 @@ function createLab(lab) {
         var exId = this.id.split('-');
         var num = exId[exId.length - 1] - 1;
         var result = getPublishTable(j, j.html());
-        if (confirm("Are you sure you want to " + result.word + " this lab?")) {
-            var publish = labs[num].IsPublished;
-            publish = !publish;
-            var data = JSON.stringify({
-                isPublished: publish,
-                id: labs[num].LabID
-            })
-            $.ajax({
-                contentType: 'application/json; charset=utf-8',
-                dataType: 'json',
-                type: 'POST',
-                url: '../Lab/PublishLab',
-                data: data,
-                success: function (response, textStatus, jqHXR) {
-                    labs[num].IsPublished = publish;
-                    alert("Lab was successfully " + result.word + "ed!");
-                    j.html(result.opp);
-                    result.act();
-                },
-                error: function (jqHXR, textStatus, errorThrown) {
-                    console.log("Could not (un)publish lab");
-                }
-            });
-            
-        }
+        modalConfirm({
+            msg: "Are you sure you want to " + result.word + " this lab?",
+            okData: { num: num, result: result },
+            ok: function (event) {
+                var num = event.data.num;
+                var result = event.data.result;
+                var publish = labs[num].IsPublished;
+                publish = !publish;
+                var data = JSON.stringify({
+                    isPublished: publish,
+                    id: labs[num].LabID
+                })
+                $.ajax({
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    type: 'POST',
+                    url: '../Lab/PublishLab',
+                    data: data,
+                    success: function (response, textStatus, jqHXR) {
+                        labs[num].IsPublished = publish;
+                        var word = result.word;
+                        word = word[0].toUpperCase() + word.substring(1);
+                        modalAlert("Lab was successfully " + result.word + "ed!", "Lab " + word + "ed");
+                        j.html(result.opp);
+                        result.act();
+                    },
+                    error: function (jqHXR, textStatus, errorThrown) {
+                        console.log("Could not (un)publish lab");
+                    }
+                });
+            }
+        });
     });
     /*=========================================
       Open a lab and go move to the Lab Editor.
@@ -133,10 +154,10 @@ function createLab(lab) {
     });
     $(".modal").on('show.bs.modal', function () {
         $(".modal-dialog").css("margin-top", $(window).height() / 3).css("background", "white").css("border-radius", 4);
+        $("#lab-name").val("New Name");
     });
     $("#btn-new-name").on('click', function () {
-        if (!lock) {
-            lock = true; // Temporary solution because multiple threads are generated on this click.
+        mutexLock(function (args) {
             var name = $("#lab-name").val();
             var jname = JSON.stringify({ 'name': name });
             $.ajax({
@@ -146,15 +167,13 @@ function createLab(lab) {
                 url: '../Lab/CheckLabName',
                 data: jname,
                 success: function (response, textStatus, jqHXR) {
-                    lock = false;
                     location.assign('../Lab/LabEditorView/' + encodeURI(name));
                 },
                 error: function (jqHXR, textStatus, errorThrown) {
-                    alert(errorThrown);
-                    lock = false;
+                    modalAlert(errorThrown);
                 }
             });
-        }
+        }, 'newLab', {});
     });
 }
 /*===============================================================
@@ -162,27 +181,32 @@ function createLab(lab) {
     (1-index-based).
 ===============================================================*/
 function removeLab(labNum) {
-    if (confirm("Are you sure you want to remove this lab? This action cannot be undone.")) {
-        var remId = JSON.stringify({ 'id': labs[labNum - 1].LabID });
-        labs.splice(labNum - 1, 1);
-        $.ajax({
-            contentType: 'application/json; charset=utf-8',
-            dataType: 'json',
-            type: 'POST',
-            url: '../Lab/DeleteLab',
-            data: remId,
-            success: function (response, textStatus, jqHXR) {
-                alert("Lab deleted");
-            },
-            error: function (jqHXR, textStatus, errorThrown) {
-                console.log(errorThrown);
-            }
-        });
-        $("#lab-" + labNum).remove();
-        while (++labNum <= numLabs)
-            changeLab(labNum, labNum - 1);
-        numLabs--;
-    }
+    modalConfirm({
+        msg: "Are you sure you want to remove this lab? This action cannot be undone.",
+        ok: function (event) {
+            var labNum = event.data.num;
+            var remId = JSON.stringify({ 'id': labs[labNum - 1].LabID });
+            labs.splice(labNum - 1, 1);
+            $.ajax({
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'json',
+                type: 'POST',
+                url: '../Lab/DeleteLab',
+                data: remId,
+                success: function (response, textStatus, jqHXR) {
+                    modalAlert("Lab deleted","Lab Deleted");
+                },
+                error: function (jqHXR, textStatus, errorThrown) {
+                    console.log(errorThrown);
+                }
+            });
+            $("#lab-" + labNum).remove();
+            while (++labNum <= numLabs)
+                changeLab(labNum, labNum - 1);
+            numLabs--;
+        },
+        okData: { num: labNum }
+    });
 }
 /*===============================================================
     Reassign lab's position number from oldNum to newNum.

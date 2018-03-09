@@ -7,7 +7,7 @@
 @section head {
     <script type="text/javascript" src="~/Scripts/LabDirectory.js"></script>
 }
-
+<!-- Current labs students can work on. -->
 <h2>Current Labs</h2>
 <table class="table table-hover table-striped">
     <thead>
@@ -25,6 +25,23 @@
         </tr>
     </tbody>
 </table>
+<!-- Upcoming labs. Students can't access them, only be aware of them. -->
+<h2>Upcoming Labs</h2>
+<table class="table table-hover table-striped">
+    <thead>
+        <tr>
+            <th scope="col">Lab Key</th>
+            <th scope="col">Due Date</th>
+        </tr>
+    </thead>
+    <tbody id="uplabs">
+        <tr id="up-0" hidden>
+            <th scope="row" id="up-name-0"></th>
+            <th scope="row" id="up-due-0"></th>
+        </tr>
+    </tbody>
+</table>
+<!-- View past labs. Students can't work on them. -->
 <h2>Past Labs</h2>
 <table class="table table-hover table-striped">
     <thead>
