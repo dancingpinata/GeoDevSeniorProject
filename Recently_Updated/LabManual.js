@@ -116,13 +116,66 @@ function populateLab(response) {
      */
 }
 
-function barMove() {
-    var bar = document.getElementById("progressBar");
-    var width = bar.style.css("width");
-    width = width.replace(/\D/g, '');   //Strip non-numbers from width
-    var totalExercises = Model.ExerciseList.Count;
-    if (width < 100) {
-        width += ((1 / totalExercises) * 100);
-        bar.style.width = width + '%';
+
+/* 
+    Validates that all fields are filled in lab before download.
+*/
+function checkForEmpty() {
+    //TO CALL, ADD IN FORM: onsubmit="checkForEmpty()"
+
+    var empt = document.forms["form1"]["text1"].value;
+    var totalExercises = $('displayLabForm').find('input, textarea, select').length;
+    var progressBarVal = $("#progressBar").attr.value();
+
+    //ProgressBar is updated automatically. If its value < 100, there is an empty field.
+    if (progressBarVal < 100) {
+        alert("Incomplete Lab! " + ((progressBarVal * 100) * totalExercises) + "|" + totalExercises + " exercises completed.");
+        return false;
+    }
+
+    else {
+        alert("All inputs are filled.");
+        return true;
     }
 }
+
+/* 
+    Dynamically tracks progress in lab. 
+    Also displays form textbox's background color white-filled, yellow-empty.
+*/
+$("#displayLabForm input").keyup(function() {
+  
+    var numValid = 0;
+    var totalExercises = $('displayLabForm').find('input, textarea, select').length;
+    var percentComplete = 0;
+    var progressBar = $("#progressBar");
+
+    $("#displayLabForm input textarea select").each(function () {
+        if (this.validity.valid) {
+            numValid++;
+            document.this.style.background = 'White';
+        }
+
+        else {
+            document.this.style.background = 'Yellow';
+        }
+    });
+
+    percentComplete = ((numValid / totalExercises) * 100);
+    progressBar.attr("value", percentComplete);
+
+    /*.progress-wrap {
+    text-align: center;
+    font-size: 10px;
+    color: white;
+    margin: 0 0 20px 0;
+        progress {
+            width: 100%;
+            margin: 0 0 5px 0;
+        }
+    }*/
+});
+
+$("#download-lab-btn").click(function () {
+    LabPDFBuilderController.BuildLabPDF(labName, labString);
+});
