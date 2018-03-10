@@ -24,6 +24,7 @@ $(document).ready(function () {
     $(".modal").on('show.bs.modal', function () {
         $(".modal-dialog").css("margin-top", $(window).height() / 3).css("background", "white").css("border-radius", 4);
     });
+    $("#summernote-intro").contentEditor();
     var needsSave = false;
     $("#lab-title").val(window.document.title);
     $("#brand-title").val(window.document.title);
@@ -55,6 +56,7 @@ $(document).ready(function () {
      ==============================================================*/
     $("#save-lab-btn").click(function () {
         var title = $("#lab-title").val();
+        var intro = $("#summernote-intro").contentEditor('content');
         var exerciseTitles = [];
         var exerciseContent = [];
         var exerciseResponses = [];
@@ -67,12 +69,16 @@ $(document).ready(function () {
 
         var labData = JSON.stringify({
             'title': title,
+            'intro': intro,
             'exerciseTitles': exerciseTitles,
             'exerciseContent': exerciseContent,
             'exerciseResponses': exerciseResponses,
             'name': meta.Name,
             'key': meta.LabID,
-            'created': meta.DateTimeCreated
+            'created': meta.DateTimeCreated,
+            'due': due,
+            'isPublished': isPublished,
+            'publishDate': publishDate
         });
 
         $.ajax({
@@ -82,7 +88,8 @@ $(document).ready(function () {
             url: '../../Lab/Save',
             data: labData,
             success: function (response, textStatus, jqHXR) {
-                modalAlert("Lab was saved successfully!","Lab Saved");
+                modalAlert("Lab was saved successfully!", "Lab Saved");
+                $('#preview-lab-btn').prop('disabled', false);
             },
             error: function (jqHXR, textStatus, errorThrown) {
                 console.log("The following errors occurred when saving the lab: " + textStatus, errorThrown);
@@ -156,7 +163,22 @@ function loadExercises(exlist, id) {
 // load lab data into the editor
 function loadLab(lab) {
     $("#lab-title").val(lab.Title);
+    $("#summernote-intro").contentEditor('content', lab.Intro);
     loadExercises(lab.ExerciseList, '');
+    $.ajax({
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+        type: 'POST',
+        url: '../../Lab/CheckLabName',
+        data: JSON.stringify({ 'name': lab.Title }),
+        success: function (response, textStatus, jqHXR) {
+            $('#preview-lab-btn').prop('disabled', true);
+        }
+    });
+    /*if (lab.Intro == "" && lab.ExerciseList.length == 1
+        && lab.ExerciseList[0].ExerciseTitle == 'Test Exercise'
+        && lab.ExerciseList[0].Content == 'Lorem Ipsum')
+        */
 }
 /*=============================================================
  * Adds proper event listeners.

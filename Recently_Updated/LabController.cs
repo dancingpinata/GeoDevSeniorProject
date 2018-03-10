@@ -105,7 +105,7 @@ namespace GeoLab100.Controllers
             DateTime? due = DateTime.TryParse(datetime, out d) ? d : due = null;
             labKey = id;
             Lab lab = ImportLab();
-            lab.DueDate = d;
+            lab.DueDate = due;
             string content = SerializeLab(lab);
             string sql = "USE GEOL100LABS; UPDATE Labs SET Content = @content WHERE Lab_ID = @id";
             using (var connection = ConnectToServer())
@@ -125,16 +125,23 @@ namespace GeoLab100.Controllers
          *  under the global labKey
          * ==============================================================================*/
         [HttpPost]
-        public ActionResult Save(string title, string[] exerciseTitles, string[] exerciseContent, string[] exerciseResponses, string name, string key, string created)
+        public ActionResult Save(string title, string intro,
+            string[] exerciseTitles, string[] exerciseContent, string[] exerciseResponses,
+            string name, string key, string created,
+            DateTime? due, bool isPublished, DateTime? publishDate)
         {
             labKey = key;
             DateTime dtCreated = DateTime.Parse(created);
             Models.Lab lab = new Models.Lab();
             lab.Title = title;
+            lab.Intro = intro;
             /* Lab DueDate will be set from the Lab Manager once it is created
                 I left this hear as an example of the expected format 
             */
-            //lab.DueDate = new DateTime(2017, 07, 07);
+            lab.DueDate = due;
+            object pubObj = publishDate; // handle evaluating publish date
+            if (pubObj == null)
+                pubObj = DBNull.Value;
             lab.ExerciseList = new List<Models.Exercise>();
             int children = 0;
             for (int i = 0; i < exerciseTitles.Length; i++)
@@ -165,9 +172,8 @@ namespace GeoLab100.Controllers
             */
             DeleteLab();
 
-            string sql = "USE GEOL100LABS; INSERT INTO Labs(Lab_Name, Lab_ID, Content, Is_Overriden, Date_Time_Created, Is_Published) VALUES (@name, @id, @content, @overridden, @created, 'False');";
+            string sql = "USE GEOL100LABS; INSERT INTO Labs(Lab_Name, Lab_ID, Content, Is_Overriden, Date_Time_Created, Is_Published, Date_Time_Published) VALUES (@name, @id, @content, @overridden, @created, @ispublished, @publish);";
             string myLab = SerializeLab(lab);
-
             // These 'using' statments are the best practice for iDisposable objects
             using (MySqlConnection connection = ConnectToServer())
             {
@@ -179,7 +185,8 @@ namespace GeoLab100.Controllers
                     cmd.Parameters.AddWithValue("@content", myLab);
                     cmd.Parameters.AddWithValue("@overridden", isOverriden);
                     cmd.Parameters.AddWithValue("@created", dtCreated);
-
+                    cmd.Parameters.AddWithValue("@ispublished", isPublished ? "True" : "False");
+                    cmd.Parameters.AddWithValue("@publish", pubObj);
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -251,7 +258,7 @@ namespace GeoLab100.Controllers
                 using (var cmd = new MySqlCommand(sql, connection))
                 {
                     cmd.Parameters.AddWithValue("@published", isPublished);
-                    object dtPublish = (isPublished.ToLower() == "true") ? (object)DateTime.UtcNow : DBNull.Value;
+                    object dtPublish = (isPublished.ToLower() == "true") ? (object)DateTime.Now : DBNull.Value;
                     cmd.Parameters.AddWithValue("@dtPublish", dtPublish);
                     cmd.Parameters.AddWithValue("@id", id);
                     cmd.ExecuteNonQuery();

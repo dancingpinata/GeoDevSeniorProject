@@ -103,25 +103,25 @@ namespace GeoLab100.Controllers
          * ==============================================*/
         private ViewModels.LabViewModel DefaultLabViewModel()
         {
-            string now = DateTime.UtcNow.ToString();
+            string now = DateTime.Now.ToString();
             ViewModels.LabViewModel model;
             string key = GenerateID(labKey);
             Models.Lab lab = new Models.Lab()
             {
                 Title = labKey,
                 Intro = "",
-                DueDate = DateTime.UtcNow,
+                DueDate = null,
                 ExerciseList = new List<Models.Exercise>()
                     {
                         new Models.Exercise()
                         {
-                            ExerciseTitle = "",
-                            Content = ""
+                            ExerciseTitle = "Test Exercise",
+                            Content = "Lorem Ipsum"
                         }
                     }
             };
             model = new ViewModels.LabViewModel(lab);
-            model.DateTimeCreated = DateTime.UtcNow.ToLongTimeString();
+            model.DateTimeCreated = now;
             model.Name = labKey;
             model.LabID = key;
             model.IsOverridden = false;
