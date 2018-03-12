@@ -1,15 +1,23 @@
 ﻿@model GeoLab100.Models.Lab
+
 @{
     ViewBag.Title = Model.Title;
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <div>
-    <script src="~/Scripts/LabManual.js"></script>
+    <script type="text/javascript" src="~/Scripts/LabManual.js"></script>
+    <script type="text/javascript" src="~/Scripts/jquery-3.3.1.min.js.js"></script>
+    
     <h4>Lab View Ver. 2</h4>
     <hr />
-    <form action="" id="displayLabForm">
-        <!-- exercise_submission.php method="post"-->
+
+    <!-- PROGRESS BAR -->
+    <progress max="100" value="0" id="progressBar"></progress>
+
+    <!-- LAB -->
+    <form action="~/Views/Lab/DisplayLabOutput.php" id="displayLabForm" method="post" onsubmit="return checkForEmpty()">
+        <!-- ~/Views/Lab/DisplayLabOutput.php method="post"-->
         <fieldset>
             <legend>
                 @Html.DisplayFor(model => model.Title) <!-- Html.Raw(HttpUtility.HtmlEncode(Model.Title)) -->
@@ -20,16 +28,25 @@
                     <dt>
                         @Html.Raw(e.ExerciseTitle)
                     </dt>
-                    <dd>
-                        @Html.Raw(e.Content)
-                    </dd>
-                    <dd>
-                        @Html.Raw(e.Response)
-                        <dl>
-                            @{
-                                if (e.ExerciseList != null)
-                                {
-                                    foreach (GeoLab100.Models.Exercise sub in e.ExerciseList)
+                    if (e.Response != "" || e.ExerciseList == null)
+                    {
+                        <dd>
+                            @Html.Raw(e.Content)
+                        </dd>
+                        <dd>
+                            @Html.Raw(e.Response)
+                            <br />
+                        </dd>
+                    }
+                    else
+                    {
+                        <dd>
+                            <fieldset>
+                                <legend>
+                                    @Html.Raw(e.Content)
+                                </legend>
+                                <dl>
+                                    @foreach (GeoLab100.Models.Exercise sub in e.ExerciseList)
                                     {
                                         <dt>
                                             @Html.Raw(sub.ExerciseTitle)
@@ -41,27 +58,30 @@
                                             @Html.Raw(sub.Response)
                                         </dd>
                                     }
-                                }
-                            }
-                            
-                        </dl>
-                        <br />
-                    </dd>
-                                }
+                                </dl>
+                            </fieldset>
+                            <br />
+                        </dd>
+                    }
+                }
+                }
             </dl>
         </fieldset>
     </form>
-    <div class='row row-relative'>
-        <div class='save-lab' />
-        <!--<input type="submit" value="Download">-->
-        <button type="button" onclick="alert('Lab Saved - NI!')">Save</button>
-        <br />
-        <button type="button" onclick="alert('Lab Downloaded - NI!')">Download</button>
-    </div>
-    <!-- Footer -->
-    <footer class='footer' id='footer'>
-        <div class='container-fluid'>
-            <p>Eastern Washington University</p>
-        </div>
-    </footer>
+
+            <div class='row row-relative'>
+                <div class='save-lab' />
+                <!--<input type="submit" value="Download">
+                 <button type='submit' class='btn btn-default' id='save-lab-btn'>Save</button> -->
+                <button type="button" onclick="alert('Lab Saved - NI!')">Save</button>
+                <br />
+                <button type="submit" class='btn btn-default' id='download-lab-btn' onclick="alert('Lab --> PDF Started!')">Download</button>
+            </div>
+            <!-- Footer -->
+            <footer class='footer' id='footer'>
+                <div class='container-fluid'>
+                    <p>Eastern Washington University</p>
+                </div>
+            </footer>
 </div>
+
