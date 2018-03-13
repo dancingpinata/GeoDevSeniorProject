@@ -14,8 +14,8 @@
     <script>
             function check()/*function to check userid & password*/
             {
-                /*the following code checkes whether the entered userid and password are matching
-                * this should be done in PHP, JavaScript is insecure and should not handle sensitive information
+                /*
+                the following code checkes whether the entered userid and password are matching
                 */
                 var EWUid = $('#EWUid').val();
                 var pw = $('#Password').val();
@@ -29,8 +29,8 @@
                     contentType: 'application/json; charset=utf-8',
                     dataType: 'json',
                     type: 'POST',
-                    url: '../Login/Test', 
-                    data: loginData, 
+                    url: '../Login/Test',
+                    data: loginData,
                     success: function (response, textStatus, jqHXR)
                     {
                         if(response.type=="Student")
@@ -46,67 +46,49 @@
                         alert("Error: Username or Password is incorrect");
                     }
                 });
-                /*if (loginForm.EWUid.value == "1234" && loginForm.Password.value == "pass")
-                {
-                    if (loginForm.LoginAs.value == "Administrator")
-                    {
-                        window.location.href = '../Lab/LabManagerView';
-                        return false;
-                    }
-                    if (loginForm.LoginAs.value == "Student")
-                    {
-                        window.location.href = '../Lab/LabDirectoryView';
-                        return false;
-                    }
-                }
-                else
-                {
-                    alert("Error: Username or Password is incorrect")//displays error message
-                }*/
             }
     </script>
 </head>
-    <body>
-        <form name="loginForm" onsubmit="return check(this);">
-            <div class="container-fluid">
-                <div class="row">
-                    <div align="right" class="col-xs-6">
-                        <label for='EWUid'>EWU id:</label>
+<body>
+    <form name="loginForm" onsubmit="return check(this);">
+        <div class="container-fluid">
+            <div class="row">
+                <div align="right" class="col-xs-6">
+                    <label for='EWUid'>EWU id:</label>
 
-                    </div>
-                    <div class="col-xs-6">
-                        <input id="EWUid" type="text" />
-                    </div>
                 </div>
-                <div class="row">
-                    <div align="right" class="col-xs-6">
-                        <label for='Password'>Password:</label>
-                    </div>
-                    <div class="col-xs-6">
-                        <input id="Password" type="password" />
-                    </div>
+                <div class="col-xs-6">
+                    <input id="EWUid" type="text" />
                 </div>
-
-                <!--Remove "Login as" after getting SSO acess-->
-                <div class="row">
-                    <div align="right" class="col-xs-6">
-                        <label for='Admin'>Login as:</label>
-                    </div>
-                    <div class="col-xs-6">
-                        <select id="LoginAs">
-                            <option> Administrator</option>
-                            <option> Student </option>
-                        </select>
-                    </div>
+            </div>
+            <div class="row">
+                <div align="right" class="col-xs-6">
+                    <label for='Password'>Password:</label>
+                </div>
+                <div class="col-xs-6">
+                    <input id="Password" type="password" />
                 </div>
             </div>
 
-            <div align="center">
-                <input id="Submit" class="btn btn-success" onclick="check()" value="Login" />
+            <!--Remove "Login as" after getting SSO acess-->
+            <div class="row">
+                <div align="right" class="col-xs-6">
+                    <label for='Admin'>Login as:</label>
+                </div>
+                <div class="col-xs-6">
+                    <select id="LoginAs">
+                        <option> Administrator</option>
+                        <option> Student </option>
+                    </select>
+                </div>
             </div>
+        </div>
 
-        </form>
+        <div align="center">
+            <Submit id="Submit" class="btn btn-success" onclick="check()" value="Login">Login</Submit>
+        </div>
 
-    </body>
+    </form>
+
+</body>
 </html>
-
