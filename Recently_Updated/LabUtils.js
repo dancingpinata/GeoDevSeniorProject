@@ -218,6 +218,9 @@ function modalConfirm(val) {
         $('#btn-cancel').show();
     else
         $('#btn-cancel').hide();
+    // $)
+    var x = $('#btn-confirm');
+    $('#btn-confirm').off(); // This line is very important!!
     $('#btn-confirm').on('click', val.okData, val.ok);
 }
 /*===============================================================================
