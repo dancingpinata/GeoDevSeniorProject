@@ -18,9 +18,14 @@ namespace GeoLab100.Models
         {
             get
             {
+                if (Response == null)
+                    return "";
                 string [] quotes = Response.Split('"');
                 int index = Array.FindIndex(quotes, ContainsID);
-                return quotes[index + 1];
+                if (index < quotes.Length - 2)
+                    return quotes[index + 1];
+                else
+                    return "";
             }
         }
 
