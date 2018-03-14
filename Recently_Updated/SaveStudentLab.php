@@ -1,9 +1,12 @@
-﻿<?php
+﻿<!DOCTYPE HTML>  
+<html>
+<body>
+
+<?php
 	include 'db_connection.php';
 
-	echo '<script language="javascript">';
-	echo 'alert("In SaveStudentLab")';
-	echo '</script>';
+	$message = "In SaveStudentLab";
+	call_alert($message);
  
 	$conn = OpenCon();
 
@@ -27,33 +30,39 @@
 		$ExerciseInfo[] = $row_ex;
 	}
 	
-	echo '<script language="javascript">';
-	echo 'alert("Before DB Save.")';
-	echo '</script>';
+	$message = "Before DB Save";
+	call_alert($message);
 
+	$querySuccess = 0;
 	foreach ($ExerciseInfo as $Exercise) {
 		$sql = "INSERT IGNORE INTO Student_Lab_Answers (Student_ID, Lab_ID, Exercise_ID, Exercise_Title, Exercise_Answer)
 			VALUES ($StudentID, $Lab_ID, $Exercise[Exercise_ID], $Exercise[Exercise_Title], $LabFormData[$Exercise[Exercise_ID]])";
+
+		if ($conn->query($sql) === TRUE) {
+			$querySuccess = $querySuccess + 1;
+			echo "Lab saved successfully!";
+		} else {
+			echo "Error: " . $sql . "<br>" . $conn->error;
+		}
 	}
 
-	echo '<script language="javascript">';
-	echo 'alert("After DB Save.")';
-	echo '</script>';
-
-
-	if ($conn->query($sql) === TRUE) {
-		echo "Lab saved successfully!";
-	} else {
-		echo "Error: " . $sql . "<br>" . $conn->error;
-	}
+	$message = "Queries Successful: $querySuccess";
+	call_alert($message);
  
 	CloseCon($conn);
 
 
 	 function secure_input($data) {
-	  $data = trim($data);
-	  $data = stripslashes($data);
-	  $data = htmlspecialchars($data);
-	  return $data;
+		$data = trim($data);
+		$data = stripslashes($data);
+		$data = htmlspecialchars($data);
+		return $data;
+	}
+
+	function call_alert($message) {
+		echo "<script type='text/javascript'>alert('$message');</script>";
 	}
 ?>
+
+</body>
+</html>

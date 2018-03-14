@@ -92,12 +92,15 @@ $(document).ready(function () {
         modalAlert("AFTER CHANGE EVENT\nNum Valid: " + totalValidExercises + "|" + totalGroupedExercises, "ProgressBar Check");
     });
 
+    $("#download-lab-btn").off();
     $("#download-lab-btn").click(function () {
         LabPDFBuilderController.BuildLabPDF(labName, labString);
     });
 
+    $("#save-lab-btn").off();
     $("#save-lab-btn").click(function () {
         modalAlert("OnClick Save Lab Button!", "SaveLab");
+        document.getElementById("displayLabForm").submit();
     });
 
 
@@ -260,4 +263,18 @@ function checkForEmpty() {
         modalAlert("All inputs are filled.", "Lab Completion");
         return true;
     }
+}
+
+function saveExercises() {
+    //Need for database: Student_ID, Lab_ID, Exercise_ID, Exercise_Title, Exercise_Answer
+
+    var Student_ID = document.getElementById("studentIDField").getAttribute("value");
+
+    var labURL = window.location.pathname;
+    var urlArray = LabURL.split("/");
+    var labString = urlArray[urlArray.length - 1];
+    var labStringArray = labString.split("-");
+
+    var Lab_Name = labStringArray[0];
+    var Lab_ID = labStringArray[1];
 }

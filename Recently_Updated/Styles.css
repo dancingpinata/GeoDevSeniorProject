@@ -244,7 +244,7 @@ select:invalid {
 
 /* Placeholder class is in Input tag with the following types: text, search, url, tel, email, and password*/
 input[placeholder] {
-    background-color: gray;
+    color: gray;
 }
 
 /* PROGRESS BAR */

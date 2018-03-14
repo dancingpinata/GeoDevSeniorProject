@@ -14,8 +14,7 @@
     <hr />
 
     <!-- PROGRESS BAR -->
-    <!-- Progress Bar Breakdown: https://css-tricks.com/html5-progress-element/ -->
-    <p class="progressBar-percent" style="width:100%" data-value="0"/>
+    <p class="progressBar-percent" style="width:100%" data-value="0"/> <!-- Progress Bar further options: https://css-tricks.com/html5-progress-element/ -->
         <progress max="100" value="0" id="progressBar">
             <div class="progressBar-oldBrowsers">
                 <span style="width: 0%;" id="progressBar-oldBrowsers">Progress: 0%</span>
@@ -25,7 +24,7 @@
         <!-- LAB -->
         <form action="~/Scripts/SaveStudentLab.php" id="displayLabForm" method="post">
             <!-- onsubmit="return checkForEmpty()" -->
-            <!-- Hidden Field for accessing Student_ID (as User.Name) -->
+            <!-- Hidden Field for accessing Student_ID -->
             <input type="hidden" name="studentID" value="Model.Name" id="studentIDField" />
 
             <fieldset>
@@ -84,7 +83,7 @@
              <button type='submit' class='btn btn-default' id='save-lab-btn'>Save</button> -->
             <button type="submit" class='btn btn-default' id='save-lab-btn'>Save</button>
             <br />
-            <button type="button" class='btn btn-default' id='download-lab-btn' onclick="">Download</button>
+            <button type="button" class='btn btn-default' id='download-lab-btn'>Download</button>
         </div>
         <!-- Footer -->
         <footer class='footer' id='footer'>
