@@ -37,6 +37,7 @@ namespace GeoLab100.Controllers
         //private Models.Lab lab = new Models.Lab();
         private string isOverriden = "false";
         private string labKey = "Lab1Key"; // with multiple labs this could be changed to the lab's title?
+        
         /* ==============================================================================*
          *  Go to Lab Editor view
          * ==============================================================================*/
@@ -44,16 +45,10 @@ namespace GeoLab100.Controllers
         {
             labKey = id;
             ViewModels.LabViewModel model;
-            try
-            {
-                if (!TryImportLabViewModel(out model))
-                    model = DefaultLabViewModel();
-            }
-            catch (Exception)
-            {
-                model = DefaultLabViewModel();
-            }
-            return View(model);
+            model = TryImportLabViewModel();
+            User user = Session["User"] as User;
+            user.CurrentLabState = model;
+            return View(user);
         }
 
         /* ==============================================================================*
@@ -61,20 +56,20 @@ namespace GeoLab100.Controllers
          * ==============================================================================*/
         public ActionResult LabManagerView()
         {
-            return View("LabManagerView");
+            User user = Session["User"] as User;
+            user.CurrentLabState = null; // user is not in current lab
+            return View(user);
         }
-
+        /* ========================================================
+         * Go to Lab Directory view. Even though the lines of code
+         * are identical to that of LabManagerView(), the two methods
+         * are different per ASP.NET MVC, so do not refactor.
+         * ======================================================*/
         public ActionResult LabDirectoryView()
         {
-            List<object> labs = LabList();
-            /* refactor so labs is actual object, plan to use LINQ
-             * to filter labs by due date and published status.
-             */
-            /*labs = from o in labs
-                   where o.IsPublished == true
-                   && true
-                   select o;*/
-            return View("LabDirectoryView");
+            User user = Session["User"] as User;
+            user.CurrentLabState = null; // user is not in current lab
+            return View(user);
         }
         /* ==============================================================================*
          *  Import the existing lab under the global lab key
@@ -83,8 +78,11 @@ namespace GeoLab100.Controllers
         public ActionResult DisplayLab(string id)
         {
             labKey = id;
-            Models.Lab lab = ImportLab();
-            return View(lab);
+            User user = Session["User"] as User;
+            ViewModels.LabViewModel lab;
+            lab = TryImportLabViewModel();
+            user.CurrentLabState = lab;
+            return View(user);
         }
         /* ======
          * Retrieve information about labs
@@ -136,13 +134,14 @@ namespace GeoLab100.Controllers
             lab.Title = title;
             lab.Intro = intro;
             /* Lab DueDate will be set from the Lab Manager once it is created
-                I left this hear as an example of the expected format 
+                I left this here as an example of the expected format 
             */
             lab.DueDate = due;
             object pubObj = publishDate; // handle evaluating publish date
             if (pubObj == null)
                 pubObj = DBNull.Value;
             lab.ExerciseList = new List<Models.Exercise>();
+            List<Exercise> list = new List<Exercise>();
             int children = 0;
             for (int i = 0; i < exerciseTitles.Length; i++)
             {
@@ -155,17 +154,39 @@ namespace GeoLab100.Controllers
                 };
                 e.ExerciseList = new List<Exercise>();
                 if (!int.TryParse(exerciseResponses[i], out children))
-                    e.Response = exerciseResponses[i]; // This feature has yet to be implimented
+                {
+                    e.Response = exerciseResponses[i]; // This feature has yet to be implemented
+                    list.Add(e);
+                }
                 else
-                    for(int j = 0; j < children; j++)
-                        e.ExerciseList.Add(new Exercise()
+                    for (int j = 0; j < children; j++)
+                    {
+                        i++;
+                        Exercise ex = new Exercise()
                         {
-                            ExerciseTitle = exerciseTitles[++i],
+                            ExerciseTitle = exerciseTitles[i],
                             Content = exerciseContent[i],
                             Response = exerciseResponses[i]
-                        });
+                        };
+                        e.ExerciseList.Add(ex);
+                        list.Add(ex);
+                    }
                 lab.ExerciseList.Add(e);
             }
+            /*using (var connection = ConnectToServer())
+            {
+                foreach (Exercise e in list)
+                {
+                    string insert = "USE GEOL100LABS; INSERT IGNORE INTO Exercises(Lab_ID, Exercise_ID, Exercise_Title) VALUES (@lab, @exercise, @title)";
+                    using (var cmd = new MySqlCommand(insert, connection))
+                    {
+                        cmd.Parameters.AddWithValue("@lab", labKey);
+                        cmd.Parameters.AddWithValue("@exercise", e.ExerciseID);
+                        cmd.Parameters.AddWithValue("@title", e.ExerciseTitle);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+            }*/
             /* Lab is deleted due to overwritting problems
                 Another way to solve this problem should eventually be researched
                 to lighten the load of server calls
@@ -189,6 +210,18 @@ namespace GeoLab100.Controllers
                     cmd.Parameters.AddWithValue("@publish", pubObj);
                     cmd.ExecuteNonQuery();
                 }
+
+                foreach (Exercise e in list)
+                {
+                    string insert = "USE GEOL100LABS; INSERT IGNORE INTO Exercises(Lab_ID, Exercise_ID, Exercise_Title) VALUES (@lab, @exercise, @title)";
+                    using (var cmd = new MySqlCommand(insert, connection))
+                    {
+                        cmd.Parameters.AddWithValue("@lab", labKey);
+                        cmd.Parameters.AddWithValue("@exercise", e.ExerciseID);
+                        cmd.Parameters.AddWithValue("@title", e.ExerciseTitle);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
             }
             return Json("true"); // the content of this return statement is currently irrelevant and can be changed to any string that you want
         }
@@ -196,8 +229,10 @@ namespace GeoLab100.Controllers
         [HttpPost]
         public ActionResult CheckLabName(string name)
         {
-            if (name == null || name == "")
-                return new HttpStatusCodeResult(400, "Lab name is empty.");
+            if (name == null || name == "") // name cannot be null or empty
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Lab name is empty.");
+            if (name.Length > 100) // name cannot be too long
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, "Lab name is too long.");
             string msg = "OK";
             using (var connection = ConnectToServer())
             {
@@ -205,12 +240,16 @@ namespace GeoLab100.Controllers
                 {
                     cmd.Parameters.AddWithValue("@name", name);
                     using (var reader = cmd.ExecuteReader())
-                        if (reader.Read())
+                    {
+                        while (reader.Read())
+                        {
                             msg = "Lab with that name already exists.";
+                        }
+                    }
                 }
             }
             if (msg != "OK")
-                return new HttpStatusCodeResult(400, msg);
+                return new HttpStatusCodeResult(HttpStatusCode.BadRequest, msg);
             return Json("OK");
         }
         /* ==============================================================================*
@@ -240,8 +279,9 @@ namespace GeoLab100.Controllers
             lab = DeserializeLab(myLab);
             return lab;
         }
-
-        
+        /* =======================================
+         * AJAX call to delete lab
+         * =====================================*/
         [HttpPost]
         public ActionResult DeleteLab(string id)
         {
@@ -249,6 +289,9 @@ namespace GeoLab100.Controllers
             DeleteLab();
             return Json("OK");
         }
+        /* =======================================
+         * AJAX call to publish lab
+         * =====================================*/
         [HttpPost]
         public ActionResult PublishLab(string id, string isPublished)
         {

@@ -31,11 +31,13 @@ $(document).ready(function () {
 function createPast(lab) {
     createLab(lab, 'past');
     // redirect to current lab
-    $("#past-name-" + numLabs.cur).on('click', function () {
+    var pastName = '#past-name-' + numLabs.past;
+    $(pastName).off();
+    $(pastName).on('click', function () {
         var exId = this.id.split('-');
         var num = exId[exId.length - 1] - 1;
         var str = encodeURI(labs.past[num].LabID);
-        /*location.assign*/console.log('../Lab/LabEditorView/' + str);
+        window.open('../Lab/DisplayLab/' + str);
     });
 }
 /*============================================================
@@ -45,11 +47,13 @@ function createPast(lab) {
 function createCur(lab) {
     createLab(lab, 'cur');
     // redirect to current lab
-    $("#cur-name-" + numLabs.cur).on('click', function () {
+    var curName = '#cur-name-' + numLabs.cur;
+    $(curName).off();
+    $(curName).on('click', function () {
         var exId = this.id.split('-');
         var num = exId[exId.length - 1] - 1;
         var str = encodeURI(labs.cur[num].LabID);
-        /*location.assign*/console.log('../Lab/LabEditorView/' + str);
+        window.open('../Lab/DisplayLab/' + str);
     });
 }
 /*=============================================================
