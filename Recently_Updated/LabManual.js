@@ -23,7 +23,7 @@ function saveResponses() {
         { type: 'multi-many', ans: function (tag) { return $("form", tag).html(); } }
         // other types not implemented, but are handled similarly
     ];
-    for(var i = 1; i <= numResponses; i++) {
+    for (var i = 1; i <= numResponses; i++) {
         var ex = $("#response-" + i).clone();
         var match = false;
         for (var j = 0; !match && j < map.length; j++)
@@ -68,6 +68,46 @@ function saveResponses() {
  * only 
  */
 $(document).ready(function () {
+    /* 
+    Dynamically tracks progress in lab. 
+    Also displays form textbox's background color white-filled, yellow-empty.
+    */
+    $("#displayLabForm").change(function () {
+
+        var numValid = 0;
+        var totalExercises = $('displayLabForm').find('input, textarea, select').length;
+        var percentComplete = 0;
+        //var progressBar = $("#progressBar");
+
+        $("#displayLabForm input textarea select").each(function () {
+            if (this.checkValidity()) {
+                numValid++;
+                document.this.style.background = 'White';
+            }
+
+            else {
+                document.this.style.background = 'Yellow';
+            }
+        });
+
+        if (numValid >= 0 && numValid < totalExercises) {
+            percentComplete = ((numValid / totalExercises) * 100);
+        } else {
+            percentComplete = 100;
+        }
+
+        //progressBar.attr("value", percentComplete);
+        document.getElementById("progressBar").value = percentComplete;
+        document.getElementById("progressBar-oldBrowsers").style.width = "" + percentComplete + "%";
+    });
+
+    $("#download-lab-btn").click(function () {
+        LabPDFBuilderController.BuildLabPDF(labName, labString);
+    });
+
+
+
+
     /*
     $.ajax({
         contentType: 'application/json; charset=utf-8',
@@ -125,7 +165,8 @@ function checkForEmpty() {
 
     var empt = document.forms["form1"]["text1"].value;
     var totalExercises = $('displayLabForm').find('input, textarea, select').length;
-    var progressBarVal = $("#progressBar").attr.value();
+    //var progressBarVal = $("#progressBar").attr.value();
+    var progressBarVal = document.getElementById("progressBar-oldBrowsers").value;  //Using oldBrowser code guarentees that value will get found.
 
     //ProgressBar is updated automatically. If its value < 100, there is an empty field.
     if (progressBarVal < 100) {
@@ -139,43 +180,3 @@ function checkForEmpty() {
     }
 }
 
-/* 
-    Dynamically tracks progress in lab. 
-    Also displays form textbox's background color white-filled, yellow-empty.
-*/
-$("#displayLabForm input").keyup(function() {
-  
-    var numValid = 0;
-    var totalExercises = $('displayLabForm').find('input, textarea, select').length;
-    var percentComplete = 0;
-    var progressBar = $("#progressBar");
-
-    $("#displayLabForm input textarea select").each(function () {
-        if (this.validity.valid) {
-            numValid++;
-            document.this.style.background = 'White';
-        }
-
-        else {
-            document.this.style.background = 'Yellow';
-        }
-    });
-
-    percentComplete = ((numValid / totalExercises) * 100);
-    progressBar.attr("value", percentComplete);
-
-    /*.progress-wrap {
-    text-align: center;
-    font-size: 10px;
-    color: white;
-    margin: 0 0 20px 0;
-        progress {
-            width: 100%;
-            margin: 0 0 5px 0;
-        }
-    }*/
-});
-
-$("#download-lab-btn").click(function () {
-    LabPDFBuilderController.BuildLabPDF(labName, labString);
-});

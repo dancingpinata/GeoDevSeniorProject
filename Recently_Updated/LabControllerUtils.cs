@@ -134,34 +134,46 @@ namespace GeoLab100.Controllers
          * is set. Otherwise, return false and model will be null.
          * (Intent is not to use model if method returns false).
          * =======================================*/
-        private bool TryImportLabViewModel(out ViewModels.LabViewModel model)
+        private ViewModels.LabViewModel TryImportLabViewModel()
         {
-            model = null;
-            string sql = "USE GEOL100LABS; SELECT * FROM Labs WHERE Lab_ID = @key";
-            using (var connection = ConnectToServer())
+            ViewModels.LabViewModel model = null;
+            try
             {
-                using (var cmd = new MySqlCommand(sql, connection))
+                string sql = "USE GEOL100LABS; SELECT * FROM Labs WHERE Lab_ID = @key";
+                using (var connection = ConnectToServer())
                 {
-                    cmd.Parameters.AddWithValue("@key", labKey);
-                    using (var reader = cmd.ExecuteReader())
+                    using (var cmd = new MySqlCommand(sql, connection))
                     {
-                        while (reader.Read())
+                        cmd.Parameters.AddWithValue("@key", labKey);
+                        using (var reader = cmd.ExecuteReader())
                         {
-                            string myLab = reader["Content"].ToString();
-                            Models.Lab lab = DeserializeLab(myLab);
-                            model = new ViewModels.LabViewModel(lab);
-                            model.Name = reader["Lab_Name"].ToString();
-                            model.LabID = reader["Lab_ID"].ToString();
-                            model.DateTimeCreated = reader["Date_Time_Created"].ToString();
-                            bool b;
-                            if (bool.TryParse(reader["Is_Published"].ToString(), out b))
-                                if (model.IsPublished = b)
-                                    model.DateTimePublished = reader["Date_Time_Published"].ToString();
+                            while (reader.Read())
+                            {
+                                string myLab = reader["Content"].ToString();
+                                Models.Lab lab = DeserializeLab(myLab);
+                                model = new ViewModels.LabViewModel(lab);
+                                model.Name = reader["Lab_Name"].ToString();
+                                model.LabID = reader["Lab_ID"].ToString();
+                                model.DateTimeCreated = reader["Date_Time_Created"].ToString();
+                                bool b;
+                                if (bool.TryParse(reader["Is_Published"].ToString(), out b))
+                                {
+                                    model.IsPublished = b;
+                                    if (b)
+                                        model.DateTimePublished = reader["Date_Time_Published"].ToString();
+                                }       
+                            }
                         }
                     }
                 }
             }
-            return model != null;
+            catch(Exception)
+            {
+                model = DefaultLabViewModel();
+            }
+            if (model == null)
+                model = DefaultLabViewModel();
+            return model;
         }
         /*=============================
          * Generate unique ID for lab 

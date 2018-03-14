@@ -2,7 +2,7 @@
     position: relative;
 }
 
-/* navbar */
+/* NAVBAR */
 .navbar-default {
     background-color: #a10022;
     border-color: black;
@@ -37,7 +37,7 @@
     color: white;
 }
 
-/* footer */
+/* FOOTER */
 .footer {
     color: white;
     box-sizing: border-box;
@@ -62,7 +62,7 @@
         bottom: 0;
     }
 
-/* Lab Title */
+/* LAB EDITOR */
 #create-exercise-btn {
     margin-bottom: 1em;
 }
@@ -125,6 +125,18 @@
     margin-bottom: 1em;
 }
 
+.new-exercise-group {
+    border: 2px solid #eeeeee;
+    border-radius: 4px;
+    margin-top: 1em;
+}
+
+.new-exercise-group button {
+    margin-top: 1em;
+    margin-left: 1em;
+    margin-bottom: 1em;
+}
+
 hr {
     border-top: 2px solid #eeeeee;
 }
@@ -146,14 +158,20 @@ hr {
 .multi-options + button{
     margin-right: 1em;
 }
-/* date picker */
+
+/* LAB MANAGER */
 .modal {
     z-index: 4000;
 }
 
+#modal-confirm, #modal-alert {
+    z-index: 8000;
+}
+
+/* date picker */
 .ui-datepicker {
     font-family: Raleway;
-    z-index: 9000;
+    z-index: 6000;
 }
 
 .ui-datepicker .ui-datepicker-title {
@@ -209,4 +227,57 @@ hr {
 .ui-datepicker .ui-datepicker-next-hover {
     background: #f7e766;
     border: none;
+}
+
+/* PROGRESS BAR */
+/* Container */
+progress[value]::-webkit-progress-bar {
+    width: 100%;
+    height: 1.5em;
+
+    border-radius: 2px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.25) inset;
+}
+
+.progressBar-oldBrowsers {
+    background-color: whiteSmoke;
+    border-radius: 2px;
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.25) inset;
+
+    width: 100%;
+    height: 1.5em;
+  
+    position: relative;
+    display: block;
+}
+
+/* Bar */
+progress[value]::-webkit-progress-value {
+    border-radius: 2px;
+    background-size: 35px 20px, 100% 100%, 100% 100%;
+
+    background-image:
+        -webkit-linear-gradient(-45deg, 
+	                           transparent 33%, rgba(0, 0, 0, .1) 33%, 
+	                           rgba(0,0, 0, .1) 66%, transparent 66%),
+	   -webkit-linear-gradient(top, 
+	                           rgba(255, 255, 255, .25), 
+	                           rgba(0, 0, 0, .25)),
+	   -webkit-linear-gradient(left, #09c, #f44);
+}
+
+.progressBar-oldBrowsers > span {
+    background-color: blue;
+    border-radius: 2px;
+
+    display: block;
+    text-indent: -9999px;
+}
+
+/* Value Percentage */
+progress[value]::-webkit-progress-value::before {
+    content: attr(value);
+    position: absolute;
+    right: 0;
+    top: -125%;
 }
