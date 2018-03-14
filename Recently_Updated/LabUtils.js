@@ -37,7 +37,7 @@ function swap(ex1, ex2, elements) {
 ==================================================*/
 var storage = {
     'short': function (tag, title, id) {
-        $("<textarea class='form-control' rows='1' pattern='[A-Za-z]*[0-9]*[^/<>]*' name='" + title + "' placeholder='Answer Here' required/>").appendTo(tag);
+        $("<textarea class='form-control' rows='1' pattern='[A-Za-z]*[0-9]*[^/<>]*' name=" + quote(title, "'") + " placeholder='Answer Here' required/>").appendTo(tag);
         //$("<label for='" + title + "'>Answer Here</label>").appendTo(tag); FOR MANUAL PLACEHOLDERS (IF NEEDED)
     },
     'blank': function (tag, title, id) {
@@ -47,13 +47,13 @@ var storage = {
         $("<textarea class='form-control' rows='5' pattern='[A-Za-z]*[0-9]*[^/<>]*' name=" + quote(title, "'") + " placeholder='Answer Here' required/>").appendTo(tag);
     },
     'multi': function (tag, title, id) {
-        insertMulti(tag, title, id, "<input type='radio'/>", $("<form/>").attr('name',title), listAppend);
+        insertMulti(tag, title, id, "<input type='radio'/>", $("<form/>").attr('name', title), listAppend);
     },
     'many': function (tag, title, id) {
         insertMulti(tag, title, id, "<input type='checkbox'/>", $("<form/>").attr('name', title), listAppend);
     },
     'dropMulti': function (tag, title, id) {
-        insertMulti(tag, title, id, "<option/>", $("<select/>").attr('name',title), dropAppend);
+        insertMulti(tag, title, id, "<option/>", $("<select/>").attr('name', title), dropAppend);
     },
     'dropMany': function (tag, title, id) {
         insertMulti(tag, title, id, "<option/>", $("<select multiple/>").attr('name', title), dropAppend);
@@ -65,8 +65,8 @@ var storage = {
         $("<input class='form-control' type='url' pattern='[A-Za-z]*[0-9]*[^<>]*' name=" + quote(title, "'") + " placeholder='Video URL' required/>").appendTo(tag);
     },
     'date': function (tag, title, id) {
-        $("<input class='form-control' type='date' name=" + quote(title,"'") + " required/>").appendTo(tag);
-        $("<label for=" + quote(title,"'") + ">MM-DD-YYYY</label>").appendTo(tag);
+        $("<input class='form-control' type='date' name=" + quote(title, "'") + " required/>").appendTo(tag);
+        $("<label for=" + quote(title, "'") + ">MM-DD-YYYY</label>").appendTo(tag);
     },
     'group': function (tag, title, id) { }
 }
@@ -110,7 +110,7 @@ function multiDrop(tag, optValues, title, id, type) {
     //Add default blank option
     $("<option value='' disabled selected hidden/>").appendTo(form);
     for (var i = 0; i < optValues.length; i++)
-        $("<option value='" + quote(optValues[i],"'") + "'/>").html(optValues[i]).appendTo(form);
+        $("<option value='" + quote(optValues[i], "'") + "'/>").html(optValues[i]).appendTo(form);
 }
 /*=================================================================
     Given jQuery result jRes and string msg, return an object
@@ -146,14 +146,14 @@ function htmlspecialchars_decode(str) {
         .replace(/&#039;/g, "'").replace(/&quot;/g, '"')
         .replace(/&amp;/g, '&');
 }
-/*==================================================
- * Convert string to escape quotes (' and ")
- =================================================*/
+/*===============================================================
+ * Convert string to escape quotes (' and ") in html attributes
+ * =============================================================*/
 function quote(str, quot) {
     if (quot == "'")
-        return quot + str.replace(/'/g, "\\'") + quot;
+        return quot + htmlspecialchars(str) + quot;
     else //if (quot == '"')
-        return quot + str.replace(/"/g, '\\"') + quot;
+        return '"' + htmlspecialchars(str) + '"';
 }
 /*=============================================
   Turns function fn into an atomic operation.
@@ -199,7 +199,7 @@ function toMilitary(time) {
   cannot disable the custom dialog.
 ==================================================================================*/
 function modalConfirm(val) {
-    if(!('ok' in val))
+    if (!('ok' in val))
         val.ok = function (event) { };
     if (!('okData' in val))
         val.okData = {};
@@ -229,6 +229,6 @@ function modalAlert(msg, header) {
     if (arguments.length == 1)
         header = '';
     var confirm = $('#modal-alert').modal('show');
-    $('.modal-header', '#modal-alert').html('<h4>'+htmlspecialchars(header)+'</h4>');
+    $('.modal-header', '#modal-alert').html('<h4>' + htmlspecialchars(header) + '</h4>');
     $('.modal-body', '#modal-alert').html(htmlspecialchars(msg));
 }
