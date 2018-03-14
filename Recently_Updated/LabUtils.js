@@ -112,7 +112,7 @@ function dropAppend(type, id, val, form) {
 function multiDrop(tag, optValues, title, id, type) {
     var form = $("<select name='" + quote(title, "'") + "' required/>").appendTo(tag);
     //Add default blank option
-    $("<option value='SELECT' selected disabled/>").html(optValues[i]).appendTo(form);
+    $("<option value='' selected disabled/>").html(optValues[i]).appendTo(form);
     for (var i = 0; i < optValues.length; i++)
         $("<option value='" + quote(optValues[i],"'") + "'/>").html(optValues[i]).appendTo(form);
 }

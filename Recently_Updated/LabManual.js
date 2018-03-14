@@ -7,6 +7,10 @@
  * For now, this file is essentially untested JS psuedocode,
  * but this is my idea of how to parse respones and their types.
  */
+
+var totalValidExercises = 0;
+var totalGroupedExercises = 0;
+
 function saveResponses() {
     var numResponses = $(".response").length;
     var responseTypes = [], answers = [];
@@ -68,18 +72,29 @@ function saveResponses() {
  * only 
  */
 $(document).ready(function () {
+    modalAlert("Lab was opened successfully!", "LabView");
+
     /* 
     Dynamically tracks progress in lab. 
     Also displays form textbox's background color white-filled, yellow-empty.
     */
     $("#displayLabForm").change(function () {
 
-        var numValid = 0;
-        var totalExercises = $('displayLabForm').find('input, textarea, select').length;
         var percentComplete = 0;
+        var formElements = document.getElementById("displayLabForm").elements;
+        var numValid = getNumberOfValidExercises(formElements);
+
+        modalAlert("BEFORE Num Valid: " + numValid + "-" + totalExercises, "ProgressBar Check");
+
+        var totalExercises = getNumberOfGroupedFormElements(formElements);
+
+        if (totalGroupedExercises != totalExercises) {
+            totalGroupedExercises = totalExercises;
+        }
+
         //var progressBar = $("#progressBar");
 
-        $("#displayLabForm input textarea select").each(function () {
+        /*$("#displayLabForm input textarea select").each(function () {
             if (this.checkValidity()) {
                 numValid++;
                 document.this.style.background = 'White';
@@ -88,17 +103,32 @@ $(document).ready(function () {
             else {
                 document.this.style.background = 'Yellow';
             }
-        });
+        });*/
 
+
+        //Calculate percentage for prograssbar value.
         if (numValid >= 0 && numValid < totalExercises) {
             percentComplete = ((numValid / totalExercises) * 100);
-        } else {
+        }
+
+        else if(numValid == totalExercises) {
             percentComplete = 100;
         }
 
-        //progressBar.attr("value", percentComplete);
-        document.getElementById("progressBar").value = percentComplete;
-        document.getElementById("progressBar-oldBrowsers").style.width = "" + percentComplete + "%";
+        else {
+            percentComplete = 0;
+        }
+        
+
+        //If global and local numValid is different, update progress bar.
+        if (totalValidExercises != numValid) {
+            document.getElementById("progressBar").value = percentComplete;
+            document.getElementById("progressBar-oldBrowsers").style.width = "" + percentComplete + "%";
+
+            totalValidExercises = numValid;
+        }
+
+        modalAlert("AFTER Num Valid: " + numValid + "-" + totalExercises, "ProgressBar Check");
     });
 
     $("#download-lab-btn").click(function () {
@@ -156,27 +186,78 @@ function populateLab(response) {
      */
 }
 
+/*
+    Gets total number of grouped form elements - lists such as radio buttons that belong together will be counted as one.
+*/
+function getNumberOfGroupedFormElements($formElements) {
+    var curExerciseName = "";
+    var numGroupedElements = 0;
+
+    //If formElements[i].name is the same as previous, these elements are a group and should be counted together (no increment).
+    for (var i = 0, formElements; formElements = formElements[i++];) {
+        if (curExerciseName != formElements[i].name) {
+            curExerciseName = formElements[i].name;
+            numGroupedElements = numGroupedElements + 1;
+        }
+    }
+
+    return numGroupedElements;
+}
+
+/*
+    Gets total number of exercises with a valid value.
+    HTML5 only supports checkValidity() and formelement.Validity.valid, use this for wider support.
+*/
+function getNumberOfValidExercises($formElements) {
+    var curExerciseName = "";
+    var doesCurGroupHaveAValid = false;
+    var numValidExercises = 0;
+
+    for (var i = 0, formElements; formElements = formElements[i++];) {
+
+        //If new exercise group OR same group + no valid input in that group yet (only one valid input needed per group).
+        if (curExerciseName != formElements[i].name || (curExerciseName != formElements[i].name && doesCurGroupHaveAValid == true)) {
+            
+            //If new group, set values for new group.
+            if (curExerciseName != formElements[i].name) {
+                curExerciseName = formElements[i].name;
+                doesCurGroupHaveAValid = false;
+            }
+
+            if (formElements.value != null && formElements.value != "") {
+                numValid++;
+                doesCurGroupHaveAValid = true;
+                //formElements.style.border = 2px solid black;
+            }
+
+            else {
+                //formElements.style.border = 2px dashed red;
+                //formElements.style.box-shadow: 0 0 5px 1px red;
+            }
+        }
+    }
+
+    return numValidExercises;
+}
 
 /* 
     Validates that all fields are filled in lab before download.
+    Function utilizes how jquery event for progressbar will auto track form completion.
 */
 function checkForEmpty() {
     //TO CALL, ADD IN FORM: onsubmit="checkForEmpty()"
 
-    var empt = document.forms["form1"]["text1"].value;
-    var totalExercises = $('displayLabForm').find('input, textarea, select').length;
-    //var progressBarVal = $("#progressBar").attr.value();
-    var progressBarVal = document.getElementById("progressBar-oldBrowsers").value;  //Using oldBrowser code guarentees that value will get found.
+    //Using oldBrowser code guarentees that value will get found.
+    var progressBarVal = document.getElementById("progressBar-oldBrowsers").value; 
 
     //ProgressBar is updated automatically. If its value < 100, there is an empty field.
     if (progressBarVal < 100) {
-        alert("Incomplete Lab! " + ((progressBarVal * 100) * totalExercises) + "|" + totalExercises + " exercises completed.");
+        modalAlert("Incomplete Lab! " + totalValidExercises + "|" + totalGroupedExercises + " exercises completed.", "Lab Completion");
         return false;
     }
 
     else {
-        alert("All inputs are filled.");
+        modalAlert("All inputs are filled.", "Lab Completion");
         return true;
     }
 }
-

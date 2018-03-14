@@ -1,5 +1,10 @@
-﻿var numLabs = { 'cur' : 0, 'past' : 0, 'up' : 0 }; // current lab, past lab and upcoming lab count
-var labs = { 'cur': {}, 'past': {}, 'up' : {} }; // the value in each key-value pair is an array of labs
+﻿/*===============================================================
+   LabDirectory.js
+   Student-Side directory and home page. Directs towards available labs.
+  ===============================================================*/
+
+var numLabs = { 'cur': 0, 'past': 0, 'up': 0 }; // current lab, past lab and upcoming lab count
+var labs = { 'cur': {}, 'past': {}, 'up': {} }; // the value in each key-value pair is an array of labs
 
 $(document).ready(function () {
     $.ajax({
@@ -23,6 +28,20 @@ $(document).ready(function () {
             console.log("Something went wrong...");
         }
     });
+
+    /*=========================================
+      Open a lab in DisplayLab.
+    =========================================*/
+    $("#lab-name-" + numLabs).off();
+    $("#lab-name-" + numLabs).on('click', function () {
+        var exId = this.id.split('-');
+        var num = exId[exId.length - 1] - 1;
+        var str = encodeURI(labs[num].LabID);
+        location.assign('../Lab/LabEditorView/' + str);
+        //window.open('../../Lab/DisplayLab/' + meta.LabID);
+    });
+    
+    //LabManager.loadLab(lab);
 });
 /*============================================================
  * Create a lab record under the Past Labs table and add a 
