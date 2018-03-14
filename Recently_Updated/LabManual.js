@@ -72,19 +72,16 @@ function saveResponses() {
  * only 
  */
 $(document).ready(function () {
-    modalAlert("Lab was opened successfully!", "LabView");
+    moveProgressBar(numValid, totalExercises);
 
     /* 
     Dynamically tracks progress in lab. 
     Also displays form textbox's background color white-filled, yellow-empty.
     */
     $("#displayLabForm").change(function () {
-
         var percentComplete = 0;
         var formElements = document.getElementById("displayLabForm").elements;
         var numValid = getNumberOfValidExercises(formElements);
-
-        modalAlert("BEFORE Num Valid: " + numValid + "-" + totalExercises, "ProgressBar Check");
 
         var totalExercises = getNumberOfGroupedFormElements(formElements);
 
@@ -92,43 +89,9 @@ $(document).ready(function () {
             totalGroupedExercises = totalExercises;
         }
 
-        //var progressBar = $("#progressBar");
+        moveProgressBar(numValid, totalExercises);
 
-        /*$("#displayLabForm input textarea select").each(function () {
-            if (this.checkValidity()) {
-                numValid++;
-                document.this.style.background = 'White';
-            }
-
-            else {
-                document.this.style.background = 'Yellow';
-            }
-        });*/
-
-
-        //Calculate percentage for prograssbar value.
-        if (numValid >= 0 && numValid < totalExercises) {
-            percentComplete = ((numValid / totalExercises) * 100);
-        }
-
-        else if(numValid == totalExercises) {
-            percentComplete = 100;
-        }
-
-        else {
-            percentComplete = 0;
-        }
-        
-
-        //If global and local numValid is different, update progress bar.
-        if (totalValidExercises != numValid) {
-            document.getElementById("progressBar").value = percentComplete;
-            document.getElementById("progressBar-oldBrowsers").style.width = "" + percentComplete + "%";
-
-            totalValidExercises = numValid;
-        }
-
-        modalAlert("AFTER Num Valid: " + numValid + "-" + totalExercises, "ProgressBar Check");
+        modalAlert("AFTER CHANGE EVENT\nNum Valid: " + totalValidExercises + "|" + totalGroupedExercises, "ProgressBar Check");
     });
 
     $("#download-lab-btn").click(function () {
@@ -189,12 +152,13 @@ function populateLab(response) {
 /*
     Gets total number of grouped form elements - lists such as radio buttons that belong together will be counted as one.
 */
-function getNumberOfGroupedFormElements($formElements) {
+function getNumberOfGroupedFormElements(formElements) {
     var curExerciseName = "";
     var numGroupedElements = 0;
 
     //If formElements[i].name is the same as previous, these elements are a group and should be counted together (no increment).
-    for (var i = 0, formElements; formElements = formElements[i++];) {
+    //for (var i = 0, formElements; formElements = formElements[i++];)
+    for (var i = 0; i < (formElements.length - 1) ; i++) {
         if (curExerciseName != formElements[i].name) {
             curExerciseName = formElements[i].name;
             numGroupedElements = numGroupedElements + 1;
@@ -208,15 +172,15 @@ function getNumberOfGroupedFormElements($formElements) {
     Gets total number of exercises with a valid value.
     HTML5 only supports checkValidity() and formelement.Validity.valid, use this for wider support.
 */
-function getNumberOfValidExercises($formElements) {
+function getNumberOfValidExercises(formElements) {
     var curExerciseName = "";
     var doesCurGroupHaveAValid = false;
     var numValidExercises = 0;
 
-    for (var i = 0, formElements; formElements = formElements[i++];) {
+    for (var i = 0; i < (formElements.length - 1); i++) {
 
-        //If new exercise group OR same group + no valid input in that group yet (only one valid input needed per group).
-        if (curExerciseName != formElements[i].name || (curExerciseName != formElements[i].name && doesCurGroupHaveAValid == true)) {
+        //If new exercise group OR same group + no valid input in that group yet (only one valid input needed per group, esp with select multiple option in list exercises).
+        if (curExerciseName != formElements[i].name || (curExerciseName == formElements[i].name && doesCurGroupHaveAValid == false)) {
             
             //If new group, set values for new group.
             if (curExerciseName != formElements[i].name) {
@@ -224,20 +188,55 @@ function getNumberOfValidExercises($formElements) {
                 doesCurGroupHaveAValid = false;
             }
 
-            if (formElements.value != null && formElements.value != "") {
-                numValid++;
+            var tag = formElements[i].tagName;
+            var type = formElements[i].type;
+            var value = formElements[i].value;
+
+            //CHECKED CASES:
+                //If exercise expects text and field is blank.
+                //If ex is multiple choice and it is selected.
+                //If ex is drop-down list and it is selected
+            if (    (((tag == "INPUT" && (type == "text" || type == "url" || type == "date")) || tag == "TEXTAREA") && value != "")
+                    || (tag == "INPUT" && (type == "radio" || type == "checkbox") && formElements[i].hasAttribute("selected"))
+                    || ((tag == "OPTION") && formElements[i].hasAttribute("selected"))
+            ){
+                numValidExercises++;
                 doesCurGroupHaveAValid = true;
-                //formElements.style.border = 2px solid black;
             }
 
             else {
-                //formElements.style.border = 2px dashed red;
                 //formElements.style.box-shadow: 0 0 5px 1px red;
             }
         }
     }
 
     return numValidExercises;
+}
+
+function moveProgressBar(numValid, totalExercises) {
+    modalAlert("BEFORE MOVE PB Num Valid: " + totalValidExercises + "|" + totalGroupedExercises, "ProgressBar Check");
+
+    //Calculate percentage for progressbar value.
+    if (numValid >= 0 && numValid < totalExercises) {
+        percentComplete = ((numValid / totalExercises) * 100);
+    }
+
+    else if (numValid == totalExercises) {
+        percentComplete = 100;
+    }
+
+    else {
+        percentComplete = 0;
+    }
+
+
+    //If global and local numValid is different, update progress bar.
+    if (totalValidExercises != numValid) {
+        document.getElementById("progressBar").value = percentComplete;
+        document.getElementById("progressBar-oldBrowsers").style.width = "" + percentComplete + "%";
+
+        totalValidExercises = numValid;
+    }
 }
 
 /* 

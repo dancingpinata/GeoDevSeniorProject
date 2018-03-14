@@ -229,6 +229,24 @@ hr {
     border: none;
 }
 
+/* DISPLAY LAB */
+textarea {
+    height: 5em;
+}
+
+select:valid {
+    border: 1px solid black;
+}
+
+select:invalid {
+    border: 1px dashed red;
+}
+
+/* Placeholder class is in Input tag with the following types: text, search, url, tel, email, and password*/
+input[placeholder] {
+    background-color: gray;
+}
+
 /* PROGRESS BAR */
 /* Container */
 progress[value]::-webkit-progress-bar {

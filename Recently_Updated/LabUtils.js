@@ -37,16 +37,14 @@ function swap(ex1, ex2, elements) {
 ==================================================*/
 var storage = {
     'short': function (tag, title, id) {
-        $("<textarea class='form-control' rows='1' pattern='[A-Za-z]*[0-9]*[^/<>]*' name='" + title + "' required/>").appendTo(tag);
-        $("<label for='" + title + "'>Answer Here</label>").appendTo(tag);
+        $("<textarea class='form-control' rows='1' pattern='[A-Za-z]*[0-9]*[^/<>]*' name='" + title + "' placeholder='Answer Here' required/>").appendTo(tag);
+        //$("<label for='" + title + "'>Answer Here</label>").appendTo(tag); FOR MANUAL PLACEHOLDERS (IF NEEDED)
     },
     'blank': function (tag, title, id) {
-        $("<input class='form-control' type='text' pattern='[A-Za-z]*[0-9]*[^/<>]*' name=" + quote(title,"'") + " required/>").appendTo(tag);
-        $("<label for=" + quote(title,"'") + ">Answer Here</label>").appendTo(tag);
+        $("<input class='form-control' type='text' pattern='[A-Za-z]*[0-9]*[^/<>]*' name=" + quote(title, "'") + " size='30' placeholder='Answer Here' required/>").appendTo(tag);
     },
     'long': function (tag, title, id) {
-        $("<textarea class='form-control' rows='5' pattern='[A-Za-z]*[0-9]*[^/<>]*' name=" + quote(title,"'") + " required/>").appendTo(tag);
-        $("<label for=" + quote(title,"'") + ">Answer Here</label>").appendTo(tag);
+        $("<textarea class='form-control' rows='5' pattern='[A-Za-z]*[0-9]*[^/<>]*' name=" + quote(title, "'") + " placeholder='Answer Here' required/>").appendTo(tag);
     },
     'multi': function (tag, title, id) {
         insertMulti(tag, title, id, "<input type='radio'/>", $("<form/>").attr('name',title), listAppend);
@@ -61,12 +59,10 @@ var storage = {
         insertMulti(tag, title, id, "<option/>", $("<select multiple/>").attr('name', title), dropAppend);
     },
     'img': function (tag, title, id) {
-        $("<input class='form-control' type='url' pattern='[A-Za-z]*[0-9]*[^<>]*' name=" + quote(title,"'") + " required/>").appendTo(tag);
-        $("<label for=" + quote(title,"'") + ">Image URL</label>").appendTo(tag);
+        $("<input class='form-control' type='url' pattern='[A-Za-z]*[0-9]*[^<>]*' name=" + quote(title, "'") + " placeholder='Image URL' required/>").appendTo(tag);
     },
     'vid': function (tag, title, id) {
-        $("<input class='form-control' type='url' pattern='[A-Za-z]*[0-9]*[^<>]*' name=" + quote(title,"'") + " required/>").appendTo(tag);
-        $("<label for=" + quote(title,"'") + ">Video URL</label>").appendTo(tag);
+        $("<input class='form-control' type='url' pattern='[A-Za-z]*[0-9]*[^<>]*' name=" + quote(title, "'") + " placeholder='Video URL' required/>").appendTo(tag);
     },
     'date': function (tag, title, id) {
         $("<input class='form-control' type='date' name=" + quote(title,"'") + " required/>").appendTo(tag);
@@ -112,7 +108,7 @@ function dropAppend(type, id, val, form) {
 function multiDrop(tag, optValues, title, id, type) {
     var form = $("<select name='" + quote(title, "'") + "' required/>").appendTo(tag);
     //Add default blank option
-    $("<option value='' selected disabled/>").html(optValues[i]).appendTo(form);
+    $("<option value='' disabled selected hidden/>").appendTo(form);
     for (var i = 0; i < optValues.length; i++)
         $("<option value='" + quote(optValues[i],"'") + "'/>").html(optValues[i]).appendTo(form);
 }
