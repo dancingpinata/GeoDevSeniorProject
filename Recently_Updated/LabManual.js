@@ -72,8 +72,6 @@ function saveResponses() {
  * only 
  */
 $(document).ready(function () {
-    moveProgressBar(numValid, totalExercises);
-
     /* 
     Dynamically tracks progress in lab. 
     Also displays form textbox's background color white-filled, yellow-empty.
@@ -98,6 +96,9 @@ $(document).ready(function () {
         LabPDFBuilderController.BuildLabPDF(labName, labString);
     });
 
+    $("#save-lab-btn").click(function () {
+        modalAlert("OnClick Save Lab Button!", "SaveLab");
+    });
 
 
 

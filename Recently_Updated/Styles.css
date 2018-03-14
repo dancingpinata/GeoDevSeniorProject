@@ -285,17 +285,31 @@ progress[value]::-webkit-progress-value {
 }
 
 .progressBar-oldBrowsers > span {
-    background-color: blue;
     border-radius: 2px;
+    height: 100%;
+
+    background-image: linear-gradient(left, #09c, #f44);
 
     display: block;
+    position: relative;
+    overflow: hidden;
     text-indent: -9999px;
 }
 
 /* Value Percentage */
-progress[value]::-webkit-progress-value::before {
+progress[value]::-webkit-progress-value::after {
     content: attr(value);
     position: absolute;
     right: 0;
     top: -125%;
+}
+
+.progressBar-percent[data-value] { 
+    position: relative; 
+}
+
+.progressBar-percent[data-value]:after {
+	content: attr(data-value) '%';
+	position: absolute; 
+    right:0;
 }

@@ -15,79 +15,81 @@
 
     <!-- PROGRESS BAR -->
     <!-- Progress Bar Breakdown: https://css-tricks.com/html5-progress-element/ -->
-    <progress max="100" value="0" id="progressBar">
-        <div class="progressBar-oldBrowsers">
-            <span style="width: 0%;" id="progressBar-oldBrowsers">Progress: 0%</span>
+    <p class="progressBar-percent" style="width:100%" data-value="0"/>
+        <progress max="100" value="0" id="progressBar">
+            <div class="progressBar-oldBrowsers">
+                <span style="width: 0%;" id="progressBar-oldBrowsers">Progress: 0%</span>
+            </div>
+        </progress>
+
+        <!-- LAB -->
+        <form action="~/Scripts/SaveStudentLab.php" id="displayLabForm" method="post">
+            <!-- onsubmit="return checkForEmpty()" -->
+            <!-- Hidden Field for accessing Student_ID (as User.Name) -->
+            <input type="hidden" name="studentID" value="Model.Name" id="studentIDField" />
+
+            <fieldset>
+                <legend>
+                    @Html.DisplayFor(model => Lab.Title) <!-- Html.Raw(HttpUtility.HtmlEncode(Model.Title)) -->
+                </legend>
+                <dl class="dl-horizontal">
+                    @foreach (GeoLab100.Models.Exercise e in Lab.ExerciseList)
+                    {
+                        <dt>
+                            @Html.Raw(e.ExerciseTitle)
+                        </dt>
+                        if (e.Response != "" || e.ExerciseList == null)
+                        {
+                            <dd>
+                                @Html.Raw(e.Content)
+                            </dd>
+                            <dd>
+                                @Html.Raw(e.Response)
+                                <br />
+                            </dd>
+                        }
+                        else
+                        {
+                            <dd>
+                                <fieldset>
+                                    <legend>
+                                        @Html.Raw(e.Content)
+                                    </legend>
+                                    <dl>
+                                        @foreach (GeoLab100.Models.Exercise sub in e.ExerciseList)
+                                        {
+                                            <dt>
+                                                @Html.Raw(sub.ExerciseTitle)
+                                            </dt>
+                                            <dd>
+                                                @Html.Raw(sub.Content)
+                                            </dd>
+                                            <dd>
+                                                @Html.Raw(sub.Response)
+                                            </dd>
+                                        }
+                                    </dl>
+                                </fieldset>
+                                <br />
+                            </dd>
+                        }
+                    }
+                </dl>
+            </fieldset>
+        </form>
+
+        <div class='row row-relative'>
+            <div class='save-lab' />
+            <!--<input type="submit" value="Download">
+             <button type='submit' class='btn btn-default' id='save-lab-btn'>Save</button> -->
+            <button type="submit" class='btn btn-default' id='save-lab-btn'>Save</button>
+            <br />
+            <button type="button" class='btn btn-default' id='download-lab-btn' onclick="">Download</button>
         </div>
-    </progress>
-
-    <!-- LAB -->
-    <form action="~/Scripts/SaveStudentLab.php" id="displayLabForm" method="post" > <!-- onsubmit="return checkForEmpty()" -->
-        <!-- Hidden Field for accessing Student_ID (as User.Name) -->
-        <input type="hidden" name="studentID" value="Model.Name" id="studentIDField" />
-
-        <fieldset>
-            <legend>
-                @Html.DisplayFor(model => Lab.Title) <!-- Html.Raw(HttpUtility.HtmlEncode(Model.Title)) -->
-            </legend>
-            <dl class="dl-horizontal">
-                @foreach (GeoLab100.Models.Exercise e in Lab.ExerciseList)
-                {
-                    <dt>
-                        @Html.Raw(e.ExerciseTitle)
-                    </dt>
-                    if (e.Response != "" || e.ExerciseList == null)
-                    {
-                        <dd>
-                            @Html.Raw(e.Content)
-                        </dd>
-                        <dd>
-                            @Html.Raw(e.Response)
-                            <br />
-                        </dd>
-                    }
-                    else
-                    {
-                        <dd>
-                            <fieldset>
-                                <legend>
-                                    @Html.Raw(e.Content)
-                                </legend>
-                                <dl>
-                                    @foreach (GeoLab100.Models.Exercise sub in e.ExerciseList)
-                                    {
-                                        <dt>
-                                            @Html.Raw(sub.ExerciseTitle)
-                                        </dt>
-                                        <dd>
-                                            @Html.Raw(sub.Content)
-                                        </dd>
-                                        <dd>
-                                            @Html.Raw(sub.Response)
-                                        </dd>
-                                    }
-                                </dl>
-                            </fieldset>
-                            <br />
-                        </dd>
-                    }
-                }
-            </dl>
-        </fieldset>
-    </form>
-
-    <div class='row row-relative'>
-        <div class='save-lab' />
-        <!--<input type="submit" value="Download">
-         <button type='submit' class='btn btn-default' id='save-lab-btn'>Save</button> -->
-        <button type="submit" class='btn btn-default' id='save-lab-btn'>Save</button>
-        <br />
-        <button type="button" class='btn btn-default' id='download-lab-btn' onclick="var name=@Html.Raw(Json.Encode(Model.Name))">Download</button>
-    </div>
-    <!-- Footer -->
-    <footer class='footer' id='footer'>
-        <div class='container-fluid'>
-            <p>Eastern Washington University</p>
+        <!-- Footer -->
+        <footer class='footer' id='footer'>
+            <div class='container-fluid'>
+<p>Eastern Washington University</p>
         </div>
     </footer>
 </div>
