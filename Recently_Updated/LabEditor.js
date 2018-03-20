@@ -1,6 +1,15 @@
 ﻿/*===============================================================
    LabEditor.js
    JS file LabEditor relies on to function.
+
+   Throughout this file are calls to a 'contentEditor' function
+   that is really a wrapper around the 'summernote' function because
+   our group agreed that in case of licensing issues and profiting
+   off this program, then ContentEditor.js should be modified
+   to have a different text editor from summernote. If the team
+   deems this to be too speculative and wants to revert the code
+   back to summernote calls, then we have provided commented-out
+   versions of the summernote calls.
   ===============================================================*/
 var numExercises = 0;
 var lab;
@@ -21,10 +30,12 @@ var labElements = ['remove-ex-',
 ];
 
 $(document).ready(function () {
+    $("#backIcon").attr("href", "../LabManagerView");
+    $(".modal").off();
     $(".modal").on('show.bs.modal', function () {
         $(".modal-dialog").css("margin-top", $(window).height() / 3).css("background", "white").css("border-radius", 4);
     });
-    $("#summernote-intro").contentEditor();
+    $("#summernote-intro").contentEditor(); //$("#summernote-intro").summernote();
     var needsSave = false;
     $("#lab-title").val(window.document.title);
     $("#brand-title").val(window.document.title);
@@ -44,6 +55,7 @@ $(document).ready(function () {
     /*=============================================================
      * Event Listener for creating a new exercise.
      ==============================================================*/
+    $("#create-exercise-btn").off();
     $("#create-exercise-btn").click(function () {
         numExercises++;
         createNewExercise(numExercises);
@@ -54,9 +66,10 @@ $(document).ready(function () {
      * - Pulls all content from the page, loads it into the variable labData 
      * - Package labData as JSON and send it to LabController.cs via AJAX 
      ==============================================================*/
+    $("#save-lab-btn").off();
     $("#save-lab-btn").click(function () {
         var title = $("#lab-title").val();
-        var intro = $("#summernote-intro").contentEditor('content');
+        var intro = $("#summernote-intro").contentEditor('content'); // $("#summernote-intro").summernote('code');
         var exerciseTitles = [];
         var exerciseContent = [];
         var exerciseResponses = [];
@@ -96,7 +109,7 @@ $(document).ready(function () {
             }
         });
     });
-
+    $("#preview-lab-btn").off();
     $("#preview-lab-btn").click(function () {
         window.open('../../Lab/DisplayLab/' + meta.LabID);
     });
@@ -108,7 +121,7 @@ function store(exerciseTitles, exerciseContent, exerciseResponses, id, count) {
     for (var i = 1; i <= count; i++) {
         var exerciseTitle = htmlspecialchars($("#ex-title-" + id + i).val());
         exerciseTitles.push(exerciseTitle);
-        var content = $("#summernote" + id + i).contentEditor('content');
+        var content = $("#summernote" + id + i).contentEditor('content'); // $("#summernote" + id + i).summernote('code');
         exerciseContent.push(content);
         var exerciseResponse = $("#ex-response-" + id + i).val();
         if (exerciseResponse != 'group') {
@@ -131,7 +144,7 @@ function loadExercises(exlist, id) {
         var createbtn = (id == '') ? '#create-exercise-btn' : '#create-exercise-btn-' + id;
         $(createbtn).click();
         $("#ex-title-" + index).val(htmlspecialchars_decode(exlist[i].ExerciseTitle));
-        $("#summernote" + index).contentEditor('content', exlist[i].Content);
+        $("#summernote" + index).contentEditor('content', exlist[i].Content); // $("#summernote" + index).summernote('code', exlist[i].Content);
         if (exlist[i].Response != '') {
             var t = 'short';
             if (exlist[i].Response != null) {
@@ -163,7 +176,7 @@ function loadExercises(exlist, id) {
 // load lab data into the editor
 function loadLab(lab) {
     $("#lab-title").val(lab.Title);
-    $("#summernote-intro").contentEditor('content', lab.Intro);
+    $("#summernote-intro").contentEditor('content', lab.Intro); // $("summernote-intro").summernote('code', lab.Intro);
     loadExercises(lab.ExerciseList, '');
     $.ajax({
         contentType: 'application/json; charset=utf-8',
@@ -188,7 +201,7 @@ function addExerciseEvents(id, html) {
 
     var d = html.parent().data('depth');
     $('#exercises-group-' + id).data('depth', d + 1);
-
+    $("#remove-ex-" + id).off();
     $("#remove-ex-" + id).on('click', function () {
         var exId = this.id.split('-');
         var exnum = exId[exId.length - 1];
@@ -211,9 +224,8 @@ function addExerciseEvents(id, html) {
                 ok: func,
                 okData: { 'exnum': exnum, 'end': end }
             });
-        return;
     });
-
+    $("#move-up-ex-" + id).off();
     $("#move-up-ex-" + id).on('click', function () {
         var up = true;
         var exId = this.id.split('-');
@@ -221,7 +233,7 @@ function addExerciseEvents(id, html) {
         var depth = $(this).parent().parent().parent().data('depth');
         moveExercise(exnum, depth, up);
     });
-
+    $("#move-down-ex-" + id).off();
     $("#move-down-ex-" + id).on('click', function () {
         var up = false;
         var exId = this.id.split('-');
@@ -229,7 +241,7 @@ function addExerciseEvents(id, html) {
         var depth = $(this).parent().parent().parent().data('depth');
         moveExercise(exnum, depth, up);
     });
-
+    $('select').off();
     $('select').on('change', function () {
         mutexLock(function (args) {
             var id = $(args).attr('id').split('-');
@@ -264,7 +276,7 @@ function addExerciseEvents(id, html) {
                 });
         }, 'select', this);
     });
-
+    $("#add-multi-option-" + id).off();
     $("#add-multi-option-" + id).on('click', function () {
         var exNum = this.parentElement.id.split('-')[2];
         var multi = $("#ex-multi-" + exNum);
@@ -277,7 +289,7 @@ function addExerciseEvents(id, html) {
         if (numOpts > 2) // Min of 2 options
             $("#remove-multi-option-" + exNum).attr("disabled", false);
     });
-
+    $("#remove-multi-option-" + id).off();
     $("#remove-multi-option-" + id).on('click', function () {
         var exNum = this.parentElement.id.split('-')[2];
         var multi = $("#ex-multi-" + exNum);
@@ -298,7 +310,7 @@ function addExerciseEvents(id, html) {
             $("#add-multi-option-" + exNum).attr("disabled", false);
     });
 
-    $("#summernote" + id).contentEditor();
+    $("#summernote" + id).contentEditor(); // $("#summernote" + id).summernote();
 }
 /*============================================
   Adds a new exercise to the exercises div
@@ -306,6 +318,7 @@ function addExerciseEvents(id, html) {
 function createNewExercise(exerciseNum) {
     var html = $("#ex-0").clone().prop("hidden", false).appendTo(".exercises").attr("id", "ex-" + numExercises);
     addExerciseEvents(exerciseNum, html);
+    $("#create-exercise-btn-" + numExercises).off();
     $("#create-exercise-btn-" + numExercises).on('click', function () {
         var exNum = this.id.split('-')[3];
         var newId = $('#exercises-group-' + exNum).children().length + 1;
@@ -342,7 +355,7 @@ function removeExercise(exerciseNum, selector) {
   Clears summernotes within 'nested' exercises
 ==============================================*/
 function contentEditorClean(exerciseNum) {
-    $('#summernote' + exerciseNum).contentEditor('destroy');
+    $('#summernote' + exerciseNum).contentEditor('destroy'); // $('#summernote' + exerciseNum).summernote('destroy');
     var children = $('#exercises-group-' + exerciseNum).children();
     for (var i = 1; i <= children.length; i++)
         contentEditorClean(exerciseNum + '_' + i);
