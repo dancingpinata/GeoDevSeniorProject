@@ -116,6 +116,7 @@ namespace GeoLab100.Controllers
                         new Models.Exercise()
                         {
                             ExerciseTitle = "Test Exercise",
+                            ExerciseID = "response-1",
                             Content = "Lorem Ipsum"
                         }
                     }
@@ -161,13 +162,13 @@ namespace GeoLab100.Controllers
                                     model.IsPublished = b;
                                     if (b)
                                         model.DateTimePublished = reader["Date_Time_Published"].ToString();
-                                }       
+                                }
                             }
                         }
                     }
                 }
             }
-            catch(Exception)
+            catch (Exception)
             {
                 model = DefaultLabViewModel();
             }

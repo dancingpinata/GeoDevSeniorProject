@@ -37,7 +37,7 @@ namespace GeoLab100.Controllers
         //private Models.Lab lab = new Models.Lab();
         private string isOverriden = "false";
         private string labKey = "Lab1Key"; // with multiple labs this could be changed to the lab's title?
-        
+
         /* ==============================================================================*
          *  Go to Lab Editor view
          * ==============================================================================*/
@@ -115,7 +115,7 @@ namespace GeoLab100.Controllers
                     cmd.ExecuteNonQuery();
                 }
             }
-                return Json("OK");
+            return Json("OK");
         }
         /* ==============================================================================*
          *  Create and serialize Lab model - ajax called from LabEditor.js
@@ -125,7 +125,7 @@ namespace GeoLab100.Controllers
         [HttpPost]
         public ActionResult Save(string title, string intro,
             string[] exerciseTitles, string[] exerciseContent, string[] exerciseResponses,
-            string name, string key, string created,
+            string[] exerciseIds, string name, string key, string created,
             DateTime? due, bool isPublished, DateTime? publishDate)
         {
             labKey = key;
@@ -148,6 +148,7 @@ namespace GeoLab100.Controllers
                 Models.Exercise e = new Models.Exercise()
                 {
                     ExerciseTitle = exerciseTitles[i],
+                    ExerciseID = exerciseIds[i],
                     Content = exerciseContent[i],
                     ExerciseList = new List<Exercise>(),
                     Response = ""
@@ -165,6 +166,7 @@ namespace GeoLab100.Controllers
                         Exercise ex = new Exercise()
                         {
                             ExerciseTitle = exerciseTitles[i],
+                            ExerciseID = exerciseIds[i],
                             Content = exerciseContent[i],
                             Response = exerciseResponses[i]
                         };
@@ -307,7 +309,7 @@ namespace GeoLab100.Controllers
                     cmd.ExecuteNonQuery();
                 }
             }
-                return Json("OK");
+            return Json("OK");
         }
         /* ==============================================================================*
          *  Delete serialized lab from the server
