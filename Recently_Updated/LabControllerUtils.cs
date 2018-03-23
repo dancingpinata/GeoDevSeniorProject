@@ -116,7 +116,6 @@ namespace GeoLab100.Controllers
                         new Models.Exercise()
                         {
                             ExerciseTitle = "Test Exercise",
-                            ExerciseID = "response-1",
                             Content = "Lorem Ipsum"
                         }
                     }

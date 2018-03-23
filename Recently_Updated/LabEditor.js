@@ -73,8 +73,7 @@ $(document).ready(function () {
         var exerciseTitles = [];
         var exerciseContent = [];
         var exerciseResponses = [];
-        var exerciseIds = [];
-        store(exerciseTitles, exerciseContent, exerciseResponses, exerciseIds, '', numExercises);
+        store(exerciseTitles, exerciseContent, exerciseResponses, '', numExercises);
 
         console.log(title);
         console.log(exerciseTitles);
@@ -87,7 +86,6 @@ $(document).ready(function () {
             'exerciseTitles': exerciseTitles,
             'exerciseContent': exerciseContent,
             'exerciseResponses': exerciseResponses,
-            'exerciseIds': exerciseIds,
             'name': meta.Name,
             'key': meta.LabID,
             'created': meta.DateTimeCreated,
@@ -119,13 +117,12 @@ $(document).ready(function () {
     loadLab(lab);
 }); // Document Ready
 // handle storing exercises while saving a lab, including nested exercises
-function store(exerciseTitles, exerciseContent, exerciseResponses, exerciseIds, id, count) {
+function store(exerciseTitles, exerciseContent, exerciseResponses, id, count) {
     for (var i = 1; i <= count; i++) {
         var exerciseTitle = htmlspecialchars($("#ex-title-" + id + i).val());
         exerciseTitles.push(exerciseTitle);
         var content = $("#summernote" + id + i).contentEditor('content'); // $("#summernote" + id + i).summernote('code');
         exerciseContent.push(content);
-        exerciseIds.push("response-" + id + i);
         var exerciseResponse = $("#ex-response-" + id + i).val();
         if (exerciseResponse != 'group') {
             var tag = $("<div class='row response'/>").attr("id", "response-" + id + i).addClass(exerciseResponse);
@@ -136,7 +133,7 @@ function store(exerciseTitles, exerciseContent, exerciseResponses, exerciseIds, 
         else {
             var len = $('#exercises-group-' + id + i).children().length;
             exerciseResponses.push(len);
-            store(exerciseTitles, exerciseContent, exerciseResponses, exerciseIds, id + i + '_', len);
+            store(exerciseTitles, exerciseContent, exerciseResponses, id + i + '_', len);
         }
     }
 }
